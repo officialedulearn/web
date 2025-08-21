@@ -1,0 +1,129 @@
+import React from "react";
+import Image, { StaticImageData } from "next/image";
+import aiChat from "@/../public/assets/icons/ai-chat.png";
+import chart from "@/../public/assets/icons/chart.png";
+import mobile from "@/../public/assets/icons/mobile.png";
+import medal1 from "@/../public/assets/icons/medal1.png";
+import medal2 from "@/../public/assets/icons/medal2.png";
+import brain from "@/../public/assets/icons/brain.png";
+
+type Props = {};
+
+const features = [
+  {
+    icon: aiChat,
+    title: "AI-Powered Tutor",
+    description:
+      "Built-in chat assistant gives instant, personalized help, just ask and learn.",
+  },
+  {
+    icon: brain,
+    title: "Interactive Quizzes",
+    description:
+      "Test your understanding with bite-sized quizzes tailored to your level.",
+  },
+  {
+    icon: medal1,
+    title: "Gamified Learning",
+    description:
+      "Earn XP, badges, and even NFTs as you progress  because learning should be rewarding.",
+  },
+  {
+    icon: medal2,
+    title: "Leaderboard Motivation",
+    description:
+      "Climb the ranks, compete with peers, and stay driven to learn more.",
+  },
+  {
+    icon: chart,
+    title: "Trackable Progress",
+    description:
+      "See your learning journey at a glance — stay on track and reach your goals.",
+  },
+  {
+    icon: mobile,
+    title: "Learn Anytime, Anywhere",
+    description:
+      "Quiz on your phone, track progress on your laptop, EduLearn fits your flow.",
+  },
+];
+
+const FeatureCard = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: StaticImageData;
+  title: string;
+  description: string;
+}) => {
+  return (
+    <div
+      className="cursor-pointer flex flex-col gap-6 items-start rounded-2xl p-6 
+                      bg-[#0D0D0D] border border-[#2E3033] 
+                      transition-all duration-300
+                      hover:shadow-lg hover:shadow-[#00FF80]/30 
+                      hover:bg-gradient-to-tr hover:from-[#00FF80]/20 hover:via-[#00FF80]/5 hover:to-[#0D0D0D]"
+    >
+      <div
+        className="flex items-center justify-center rounded-full gap-2 
+                          bg-[#0D0D0D] border border-[#2E3033] 
+                          w-[40px] h-[40px] md:w-[72px] md:h-[72px]"
+      >
+        <Image
+          src={icon}
+          alt={title}
+          width={40}
+          height={40}
+          className="w-[24px] h-[24px] md:w-[32px] md:h-[32px]"
+        />
+      </div>
+
+      <div className="flex flex-col">
+        <p className="text-[#E0E0E0] text-[20px] font-bold leading-[30px]">
+          {title}
+        </p>
+        <p className="text-[#B3B3B3] text-[16px] leading-[24px] opacity-80">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const Features = (props: Props) => {
+  return (
+    <div className="px-4 sm:px-6 md:px-8 overflow-x-hidden mt-[120px]">
+      <div className="mt-10 md:mt-20 lg:mt-30 flex flex-col gap-8 md:gap-12 lg:gap-20">
+        <div className="rounded-[16px] border-2 border-[#2E3033] bg-[#131313] text-[#00FF80] leading-[28px] md:leading-[36px] flex items-center justify-center w-fit px-4 md:px-[24px] py-2 md:py-[15.5px] text-sm md:text-base">
+          Why EduLearn
+        </div>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-8">
+          <h2 className="text-[#E0E0E0] leading-[32px] sm:leading-[40px] md:leading-[56px] font-[600] text-2xl md:text-3xl lg:text-[40px]">
+            Why EduLearn Stands Out
+          </h2>
+
+          <p className="text-[#B3B3B3] leading-[24px] md:leading-[28px] text-base md:text-lg lg:text-[20px] opacity-[0.7] font-normal md:max-w-[500px]">
+            From AI-powered tutoring to on-chain rewards, EduLearn makes
+            studying smarter, more fun, and genuinely motivating.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+          {features.map((feature, index) => (
+            <FeatureCard
+              key={index}
+              icon={feature.icon}
+              title={feature.title}
+              description={feature.description}
+            />
+          ))}
+        </div>
+       
+
+      </div>
+    </div>
+  );
+};
+
+export default Features;
