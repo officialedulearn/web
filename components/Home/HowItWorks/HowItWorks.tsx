@@ -39,14 +39,15 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-start lg:w-auto">
+          <div className="w-full flex justify-center lg:justify-end">
             <Image
               src={ChatImage}
               alt="Chat to Learn"
-              width={500}
-              className="rounded-[16px] shadow-lg w-full max-w-[280px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[500px] object-contain"
+              width={600}
+              height={400}
+              className="rounded-[16px] shadow-lg w-full sm:w-[90%] md:w-[95%] lg:w-full object-contain border-2 border-[#2E3033]"
               priority
-              sizes="(max-width: 640px) 280px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 500px"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 95vw, 100vw"
             />
           </div>
         </div>
@@ -65,14 +66,15 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-start lg:w-auto">
+          <div className="w-full flex justify-center lg:justify-start">
             <Image
               src={QuizImage}
               alt="Take Interactive Quizzes"
-              width={500}
-              className="rounded-[16px] shadow-lg w-full max-w-[280px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[500px] object-contain"
+              width={600}
+              height={400}
+              className="rounded-[16px] shadow-lg w-full sm:w-[90%] md:w-[95%] lg:w-full object-contain border-2 border-[#2E3033]"
               priority
-              sizes="(max-width: 640px) 280px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 500px"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 95vw, 100vw"
             />
           </div>
         </div>
@@ -91,14 +93,15 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-start lg:w-auto">
+          <div className="w-full flex justify-center lg:justify-end">
             <Image
               src={XPIMage}
               alt="Earn XP & Unlock Rewards"
-              width={500}
-              className="rounded-[16px] shadow-lg w-full max-w-[280px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[500px] object-contain"
+              width={600}
+              height={400}
+              className="rounded-[16px] shadow-lg w-full sm:w-[90%] md:w-[95%] lg:w-full object-contain border-2 border-[#2E3033]"
               priority
-              sizes="(max-width: 640px) 280px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 500px"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 95vw, 100vw"
             />
           </div>
         </div>
@@ -117,14 +120,15 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-start lg:w-auto">
+          <div className="w-full flex justify-center lg:justify-start">
             <Image
               src={LeaderBoard}
               alt="Climb the Leaderboard"
-              width={500}
-              className="rounded-[16px] shadow-lg w-full max-w-[280px] sm:max-w-[350px] md:max-w-[400px] lg:max-w-[500px] object-contain"
+              width={600}
+              height={400}
+              className="rounded-[16px] shadow-lg w-full sm:w-[90%] md:w-[95%] lg:w-full object-contain border-2 border-[#2E3033]"
               priority
-              sizes="(max-width: 640px) 280px, (max-width: 768px) 350px, (max-width: 1024px) 400px, 500px"
+              sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 95vw, 100vw"
             />
           </div>
         </div>

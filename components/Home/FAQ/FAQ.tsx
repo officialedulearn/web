@@ -58,7 +58,7 @@ const FAQ = (props: Props) => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-[24px] items-center mx-20 mt-[48px]">
+      <div className="flex flex-col gap-[24px] items-center md:mx-20 mt-[48px]">
         {FAQData.map((item, index) => (
           <div
             className={`flex flex-col border border-[#2E3033] rounded-[8px] w-full overflow-hidden transition-all duration-300 ${

@@ -25,14 +25,14 @@ const Hero = (props: Props) => {
 
   return (
     <div className="overflow-x-hidden px-4 sm:px-6 md:px-8">
-      <div className="my-12 sm:my-16 md:my-30 flex flex-col md:flex-row items-center md:items-end justify-between">
+      <div className="my-12 sm:my-16 md:my-30 flex flex-col md:flex-row items-end md:items-end justify-between">
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-0 left-0 w-full h-[50vh] bg-gradient-to-b from-black via-black/50 to-transparent md:hidden"></div>
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] h-[600px] bg-[#00FF80] opacity-30 blur-[160px] rounded-full"></div>
           <div className="absolute bottom-0 right-0 w-full max-w-[400px] h-[400px] bg-[#00FFA3] opacity-20 blur-[180px] rounded-full"></div>
         </div>
 
-        <div className="max-w-full sm:max-w-xl md:max-w-2xl mb-8 md:mb-0 text-center md:text-left">
+        <div className="max-w-full sm:max-w-xl md:max-w-2xl mb-8 md:mb-0 text-left md:text-center md:text-left">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] leading-tight md:leading-normal font-bold text-[#FFFFFF] mb-4">
             Learn Web3 Smarter. Earn as You Go
           </h1>

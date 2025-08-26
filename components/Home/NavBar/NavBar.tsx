@@ -75,7 +75,7 @@ const NavBar = (props: Props) => {
       {isMenuOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden">
           <div 
-            className="absolute top-[60px] right-4 left-4 bg-[#121212] py-4 px-5 z-50 shadow-lg rounded-lg md:hidden"
+            className="absolute top-[60px] right-4 left-4 bg-[#121212] py-4 px-5 z-50 shadow-lg rounded-lg md:hidden max-w-full overflow-auto w-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <ul className="list-none flex flex-col gap-4">

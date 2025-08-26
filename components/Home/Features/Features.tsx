@@ -59,28 +59,31 @@ const FeatureCard = ({
 }) => {
   return (
     <div
-      className="cursor-pointer flex flex-col gap-6 items-start rounded-2xl p-6 
+      className="cursor-pointer flex flex-col gap-6 items-start rounded-2xl p-6 md:p-8
                       bg-[#0D0D0D] border border-[#2E3033] 
                       transition-all duration-300
+                      shadow-sm shadow-[#00FF80]/10
                       hover:shadow-lg hover:shadow-[#00FF80]/30 
-                      hover:bg-gradient-to-tr hover:from-[#00FF80]/20 hover:via-[#00FF80]/5 hover:to-[#0D0D0D]"
+                      hover:bg-gradient-to-tr hover:from-[#00FF80]/20 hover:via-[#00FF80]/5 hover:to-[#0D0D0D]
+                      active:scale-[0.98] active:shadow-[#00FF80]/40"
     >
       <div
         className="flex items-center justify-center rounded-full gap-2 
                           bg-[#0D0D0D] border border-[#2E3033] 
-                          w-[40px] h-[40px] md:w-[72px] md:h-[72px]"
+                          w-[48px] h-[48px] md:w-[72px] md:h-[72px]
+                          transition-all duration-300"
       >
         <Image
           src={icon}
           alt={title}
           width={40}
           height={40}
-          className="w-[24px] h-[24px] md:w-[32px] md:h-[32px]"
+          className="w-[28px] h-[28px] md:w-[32px] md:h-[32px]"
         />
       </div>
 
       <div className="flex flex-col">
-        <p className="text-[#E0E0E0] text-[20px] font-bold leading-[30px]">
+        <p className="text-[#E0E0E0] text-[20px] font-bold leading-[30px] mb-2">
           {title}
         </p>
         <p className="text-[#B3B3B3] text-[16px] leading-[24px] opacity-80">

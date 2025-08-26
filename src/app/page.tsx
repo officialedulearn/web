@@ -7,12 +7,13 @@ import Demo from "../../components/Home/Demo/Demo";
 import Testemonial from "../../components/Home/Testemonial/Testemonial";
 import FAQ from "../../components/Home/FAQ/FAQ";
 import CTA from "../../components/Home/CTA/CTA";
+import Footer from "../../components/Home/Footer/Footer";
 
 export default function Home() {
   return (
     <>
-      <NavBar />
       <div className="md:px-[86px] px-[16px]">
+      <NavBar />
         <Hero />
         <HowItWorks />
         <Features />
@@ -20,6 +21,7 @@ export default function Home() {
         <Testemonial />
         <FAQ />
         <CTA />
+        <Footer />
       </div>
     </>
   );
