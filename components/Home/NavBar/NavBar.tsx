@@ -28,7 +28,7 @@ const NavBar = (props: Props) => {
   };
 
   return (
-    <div className="flex items-center justify-between px-4 sm:px-5 md:px-10 lg:px-[86px] mt-5 sm:mt-7 relative">
+    <div className="flex items-center justify-between px-4 mt-5 sm:mt-7 relative">
       <div>
         <Image
           src="/assets/images/logo.png"
