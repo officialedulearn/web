@@ -26,7 +26,7 @@ const HowItWorks = (props: Props) => {
         </div>
         
         <div className="flex flex-col lg:flex-row items-start gap-8 lg:justify-between mt-4 md:mt-8 lg:mt-10">
-          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-auto">
+          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-1/2">
             <div className="bg-[#00FF80] rounded-[18.3px] flex items-center justify-center w-[60px] h-[60px] md:w-[72px] md:h-[72px] text-black font-[600] text-2xl md:text-[39px]">
               01
             </div>
@@ -39,12 +39,11 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-end">
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
             <Image
               src={ChatImage}
               alt="Chat to Learn"
-              width={600}
-              height={400}
+              width={575}
               className="rounded-[16px] shadow-lg w-full sm:w-[90%] md:w-[95%] lg:w-full object-contain border-2 border-[#2E3033]"
               priority
               sizes="(max-width: 640px) 100vw, (max-width: 768px) 90vw, (max-width: 1024px) 95vw, 100vw"
@@ -53,7 +52,7 @@ const HowItWorks = (props: Props) => {
         </div>
 
         <div className="flex flex-col lg:flex-row-reverse items-start gap-8 lg:justify-between mt-4 md:mt-8 lg:mt-10">
-          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-auto">
+          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-1/2">
             <div className="bg-[#00FF80] rounded-[18.3px] flex items-center justify-center w-[60px] h-[60px] md:w-[72px] md:h-[72px] text-black font-[600] text-2xl md:text-[39px]">
               02
             </div>
@@ -66,7 +65,7 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-start">
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-start">
             <Image
               src={QuizImage}
               alt="Take Interactive Quizzes"
@@ -80,7 +79,7 @@ const HowItWorks = (props: Props) => {
         </div>
         
         <div className="flex flex-col lg:flex-row items-start gap-8 lg:justify-between mt-4 md:mt-8 lg:mt-10">
-          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-auto">
+          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-1/2">
             <div className="bg-[#00FF80] rounded-[18.3px] flex items-center justify-center w-[60px] h-[60px] md:w-[72px] md:h-[72px] text-black font-[600] text-2xl md:text-[39px]">
               03
             </div>
@@ -93,7 +92,7 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-end">
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
             <Image
               src={XPIMage}
               alt="Earn XP & Unlock Rewards"
@@ -107,7 +106,7 @@ const HowItWorks = (props: Props) => {
         </div>
 
         <div className="flex flex-col lg:flex-row-reverse items-start gap-8 lg:justify-between mt-4 md:mt-8 lg:mt-10">
-          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-auto">
+          <div className="flex flex-col gap-6 md:gap-[64px] w-full lg:w-1/2">
             <div className="bg-[#00FF80] rounded-[18.3px] flex items-center justify-center w-[60px] h-[60px] md:w-[72px] md:h-[72px] text-black font-[600] text-2xl md:text-[39px]">
               04
             </div>
@@ -120,7 +119,7 @@ const HowItWorks = (props: Props) => {
             </div>
           </div>
 
-          <div className="w-full flex justify-center lg:justify-start">
+          <div className="w-full lg:w-1/2 flex justify-center lg:justify-start">
             <Image
               src={LeaderBoard}
               alt="Climb the Leaderboard"
