@@ -3,10 +3,12 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
+import {useRouter} from "next/navigation"
 
 type Props = {};
 
 const NavBar = (props: Props) => {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   useEffect(() => {
@@ -59,7 +61,7 @@ const NavBar = (props: Props) => {
           Sign In
         </span>
 
-        <span className="h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] bg-[#00FF80] text-[#000000] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap">
+        <span className="h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] bg-[#00FF80] text-[#000000] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap" onClick={() => router.push("/auth")}>
           Sign Up
         </span>
       </div>
