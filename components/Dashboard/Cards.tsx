@@ -59,7 +59,7 @@ const Cards = (props: Props) => {
   }, [quizActivities]);
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 w-full max-w-full overflow-hidden">
+    <div className="mt-2 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 w-full max-w-full overflow-hidden">
         <div className="bg-[#1A1A1A] border border-[#2E2E2E] rounded-lg p-4 flex flex-col items-center justify-center h-[160px] min-w-0 overflow-hidden">
           <div className="flex flex-col items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-[#2E2E2E] rounded-lg flex items-center justify-center">

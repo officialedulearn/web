@@ -101,7 +101,7 @@ const useUserStore = create<UserState>((set, get) => ({
       
       set({
         user: {
-          id: authUser.id,
+          id: userFromDB.id,
           name: userFromDB.name || "User",
           email: authUser.email,
           address: userFromDB.address || null,

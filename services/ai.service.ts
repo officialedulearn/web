@@ -88,6 +88,7 @@ export class AIService {
     async generateSuggestions(dto: { userId: string }) {
         try {
             const response = await httpClient.post('/ai/suggestions', dto);
+            console.log('Suggestions:', response.data);
             return response.data;
         } catch (error: any) {
             console.error("Error generating suggestions:", error);
