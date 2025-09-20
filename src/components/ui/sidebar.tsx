@@ -26,12 +26,13 @@ import {
 } from "@/components/ui/tooltip"
 import Image from "next/image"
 import MenuIcon from "@/../public/assets/icons/dark/menu.png"
+import MenuIconMobile from "@/../public/assets/icons/dark/mobileMenu.png"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+const SIDEBAR_WIDTH = "256px"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
-const SIDEBAR_WIDTH_ICON = "3rem"
+const SIDEBAR_WIDTH_ICON = "92px"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContextProps = {
@@ -172,9 +173,10 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col",
+          "bg-sidebar text-sidebar-foreground flex h-full flex-col",
           className
         )}
+        style={{ width: "var(--sidebar-width)" }}
         {...props}
       >
         {children}
@@ -189,7 +191,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+          className="bg-sidebar text-sidebar-foreground p-0 [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -220,18 +222,19 @@ function Sidebar({
       <div
         data-slot="sidebar-gap"
         className={cn(
-          "relative w-(--sidebar-width) bg-transparent transition-[width] duration-200 ease-linear",
+          "relative bg-transparent transition-[width] duration-200 ease-linear",
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[side=right]:rotate-180",
           variant === "floating" || variant === "inset"
             ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
         )}
+        style={{ width: "var(--sidebar-width)" }}
       />
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          "fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] duration-200 ease-linear md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -241,6 +244,7 @@ function Sidebar({
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=right]:border-l",
           className
         )}
+        style={{ width: "var(--sidebar-width)" }}
         {...props}
       >
         <div
@@ -268,22 +272,24 @@ function SidebarTrigger({
       data-slot="sidebar-trigger"
       variant="ghost"
       size="icon"
-      className={cn("size-7 rounded-[9px] border border-[#2E3033] flex items-center justify-center p-0 cursor-pointer", className)}
+      className={cn("size-8 rounded-[9px] border border-[#3A3A3A] bg-[#2A2A2A] hover:bg-[#3A3A3A] flex items-center justify-center p-0 cursor-pointer relative", className)}
       onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
       }}
       {...props}
     >
-      <div className="flex items-center justify-center w-full h-full">
+      <div className="md:flex hidden items-center justify-center w-full h-full">
         <Image 
           src={MenuIcon} 
-          alt="EduLearn Logo" 
-          width={10} 
-          height={6} 
-          className="flex-shrink-0"
+          alt="Menu Toggle" 
+          width={12} 
+          height={8} 
+          className="flex-shrink-0 object-contain"
         />
       </div>
+
+      <Image src={MenuIconMobile} alt="Menu Toggle" width={26} height={23} className="flex-shrink-0 object-contain block md:hidden" />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

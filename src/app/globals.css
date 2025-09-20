@@ -122,8 +122,8 @@
   --sidebar-foreground: #B3B3B3;
   --sidebar-primary: #00FF80;
   --sidebar-primary-foreground: #000;
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-accent: #00FF80;
+  --sidebar-accent-foreground: #000;
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: #2E3033;
 }
@@ -134,5 +134,38 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  
+  /* Force sidebar background color */
+  [data-sidebar="sidebar"] {
+    background-color: #131313 !important;
+  }
+  
+  [data-slot="sidebar-inner"] {
+    background-color: #131313 !important;
+  }
+  
+  /* Collapsed sidebar styles */
+  [data-state="collapsed"] {
+    --sidebar-width: 92px;
+  }
+  
+  [data-state="expanded"] {
+    --sidebar-width: 256px;
+  }
+  
+  /* Ensure proper width transitions */
+  [data-slot="sidebar-gap"] {
+    transition: width 200ms ease-in-out;
+  }
+  
+  [data-slot="sidebar-container"] {
+    transition: width 200ms ease-in-out;
+  }
+  
+  /* Force logo to show in collapsed state */
+  [data-state="collapsed"] [data-sidebar="group-label"] {
+    opacity: 1 !important;
+    margin-top: 0 !important;
   }
 }

@@ -1,25 +1,27 @@
-"use client"
+"use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoMdClose } from "react-icons/io";
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation";
+import useUserStore from "../../../core/userState";
 
 type Props = {};
 
 const NavBar = (props: Props) => {
-  const router = useRouter()
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+  const user = useUserStore((s) => s.user);
+
   useEffect(() => {
     if (isMenuOpen) {
       const handleClickOutside = () => {
         setIsMenuOpen(false);
       };
-      
-      document.addEventListener('click', handleClickOutside);
+
+      document.addEventListener("click", handleClickOutside);
       return () => {
-        document.removeEventListener('click', handleClickOutside);
+        document.removeEventListener("click", handleClickOutside);
       };
     }
   }, [isMenuOpen]);
@@ -56,15 +58,29 @@ const NavBar = (props: Props) => {
         </ul>
       </div>
 
-      <div className="hidden md:flex items-center gap-[8px] lg:gap-[12px]">
-        <span className="border border-[#00FF80] h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] text-[#00FF80] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap">
-          Sign In
-        </span>
+      {!user ? (
+        <div className="hidden md:flex items-center gap-[8px] lg:gap-[12px]">
+          <span className="border border-[#00FF80] h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] text-[#00FF80] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap">
+            Sign In
+          </span>
 
-        <span className="h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] bg-[#00FF80] text-[#000000] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap" onClick={() => router.push("/auth")}>
-          Sign Up
-        </span>
-      </div>
+          <span
+            className="h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] bg-[#00FF80] text-[#000000] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap"
+            onClick={() => router.push("/auth")}
+          >
+            Sign Up
+          </span>
+        </div>
+      ) : (
+        <div className="hidden md:flex items-center gap-[8px] lg:gap-[12px]">
+          <span
+            className="h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] bg-[#00FF80] text-[#000000] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap"
+            onClick={() => router.push("/dashboard")}
+          >
+            Dashboard
+          </span>
+        </div>
+      )}
 
       <div className="md:hidden cursor-pointer z-50" onClick={toggleMenu}>
         {isMenuOpen ? (
@@ -76,7 +92,7 @@ const NavBar = (props: Props) => {
 
       {isMenuOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden">
-          <div 
+          <div
             className="absolute top-[60px] right-4 left-4 bg-[#121212] py-4 px-5 z-50 shadow-lg rounded-lg md:hidden max-w-full overflow-auto w-auto"
             onClick={(e) => e.stopPropagation()}
           >

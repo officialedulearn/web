@@ -32,7 +32,7 @@ const Hero = (props: Props) => {
           <div className="absolute bottom-0 right-0 w-full max-w-[400px] h-[400px] bg-[#00FFA3] opacity-20 blur-[180px] rounded-full"></div>
         </div>
 
-        <div className="max-w-full sm:max-w-xl md:max-w-2xl mb-8 md:mb-0 text-left md:text-center md:text-left">
+        <div className="max-w-full sm:max-w-xl md:max-w-2xl mb-8 md:mb-0 text-left w-[731px] md:text-left">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[64px] leading-tight md:leading-normal font-bold text-[#FFFFFF] mb-4">
             Learn Web3 Smarter. Earn as You Go
           </h1>
