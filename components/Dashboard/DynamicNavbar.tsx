@@ -55,7 +55,8 @@ const navItems = [
 export function DynamicNavbar() {
   const pathname = usePathname();
   const user = useUserStore((s) => s.user);
-
+  const theme = useUserStore((s) => s.theme);
+  const setTheme = useUserStore((s) => s.setTheme);
   const currentPage =
     navItems.find((item) => item.url === pathname) || navItems[0];
   const CurrentIcon = currentPage.icon;
@@ -106,7 +107,9 @@ export function DynamicNavbar() {
               {user?.xp}
             </p>
           </div>
-          <div>
+          <div onClick={() => {
+            setTheme(theme === "dark" ? "light" : "dark");
+          }}>
             <Image src={moon} alt="Badge" width={28} height={28} />
           </div>
         </div>
