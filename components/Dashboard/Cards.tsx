@@ -3,7 +3,6 @@ import Image from "next/image";
 import useUserStore from "@/../core/userState";
 import useActivityStore from "@/../core/activityState";
 
-// Define levels array locally (same as mobile version)
 const levels = ['novice', 'beginner', 'intermediate', 'advanced', 'expert'];
 import medal from "@/../public/assets/icons/dark/medal05.png";
 import quiz from "@/../public/assets/icons/brain02.png";
