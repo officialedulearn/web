@@ -1,7 +1,376 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import useUserStore from "@/../core/userState";
+import { UserService, User } from "@/../services/user.service";
+import avatar from "@/../public/assets/icons/avatar2.png"
+import badge from "@/../public/assets/icons/medal05.png"
+import Image from "next/image";
+import fire from "@/../public/assets/icons/fire.png"
+import silver from "@/../public/assets/icons/silver.png"
+import gold from "@/../public/assets/icons/gold.png"
+import bronze from "@/../public/assets/icons/bronze.png"
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+
+interface LeaderboardUser extends User {
+  rank: number;
+}
+
+
 export default function LeaderboardPage() {
+  const { theme, user } = useUserStore();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState<LeaderboardUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const itemsPerPage = 10;
+  
+  const userService = new UserService();
+  const currentUserId = user?.id;
+
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        setLoading(true);
+        const response = await userService.getLeaderboard();
+        const leaderboardUsers: LeaderboardUser[] = response.users.map((apiUser, index) => ({
+          ...apiUser,
+          rank: index + 1
+        }));
+        
+        setUsers(leaderboardUsers);
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch leaderboard:', err);
+        setError('Failed to load leaderboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaderboard();
+  }, []);
+
+  const tableUsers = users.slice(3);
+  const totalPages = Math.ceil(tableUsers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageUsers = tableUsers.slice(startIndex, endIndex);
+  
+  const currentUserOnPage = currentPageUsers.some(u => u.id === currentUserId);
+  
+  const currentUserData = !currentUserOnPage ? users.find(u => u.id === currentUserId) : null;
+
+  const usersToDisplay = currentUserData ? [...currentPageUsers, currentUserData] : currentPageUsers;
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      handlePageChange(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      handlePageChange(currentPage + 1);
+    }
+  };
+  
   return (
     <div>
-      <h1>Leaderboard</h1>
+      <div className="flex items-center justify-center">
+        <div className="flex items-end justify-center">
+            {users[1] && (
+              <div className="flex items-center w-[167px] justify-between flex-col py-[21px] px-[27px] gap-[5px] h-[227px] rounded-tl-[20px] border-[0.8px] border-[#2E3033] bg-[#2E3033] relative"> 
+                  <Image src={silver} alt="silver medal" width={45} height={45} className="absolute -top-[25px] z-10" />
+                  <Image src={avatar} alt="avatar" width={95} height={95} className="rounded-[27px]" />
+                  <p className="text-[#E0E0E0] text-center font-[500] leading-[26px] text-[17px]">
+                    {users[1].name}
+                  </p>
+                  <p className="text-[#E0E0E0] text-center font-[500] leading-[26px] text-[13px]">
+                    {users[1].level ? users[1].level.charAt(0).toUpperCase() + users[1].level.slice(1).toLowerCase() : 'Novice'}
+                  </p>
+
+                  <div className="flex items-center gap-[6.5px]">
+                    <Image src={badge} alt="badge" width={28} height={28} />
+                    <p className="text-[#E0E0E0] text-[15px] font-[500] leading-[22px]">
+                      {users[1].xp || 0} XP
+                    </p>
+                  </div>
+              </div>
+            )}
+            
+            {users[0] && (
+              <div className="h-[272px] bg-[#00FF80] w-[190px] flex-col flex items-center rounded-t-[20px] gap-[8px] relative">
+                  <Image src={gold} alt="gold medal" width={45} height={45} className="absolute -top-[25px] z-10" />
+                  <Image src={avatar} alt="avatar" width={95} height={95} className="rounded-[27px]" />
+                  <p className="text-[#000] text-center font-[500] leading-[26px] text-[17px]">
+                    {users[0].name}
+                  </p>
+                  <p className="text-[#000] text-center font-[500] leading-[26px] text-[13px]">
+                    {users[0].level ? users[0].level.charAt(0).toUpperCase() + users[0].level.slice(1).toLowerCase() : 'Novice'}
+                  </p>
+
+                  <div className="flex items-center gap-[6.5px]">
+                    <Image src={badge} alt="badge" width={28} height={28} />
+                    <p className="text-[#000] text-[15px] font-[500] leading-[22px]">
+                      {users[0].xp || 0} XP
+                    </p>
+                  </div>
+              </div>
+            )}
+            
+            {users[2] && (
+              <div className="flex items-center w-[167px] justify-between flex-col py-[21px] px-[27px] gap-[5px] h-[227px] rounded-tr-[20px] border-[0.8px] border-[#2E3033] bg-[#2E3033] relative">
+                  <Image src={bronze} alt="bronze medal" width={45} height={45} className="absolute -top-[25px] z-10" />
+                  <Image src={avatar} alt="avatar" width={95} height={95} className="rounded-[27px]" />  
+                  <p className="text-[#E0E0E0] text-center font-[500] leading-[26px] text-[17px]">
+                    {users[2].name}
+                  </p>
+                  <p className="text-[#E0E0E0] text-center font-[500] leading-[26px] text-[13px]">
+                    {users[2].level ? users[2].level.charAt(0).toUpperCase() + users[2].level.slice(1).toLowerCase() : 'Novice'}
+                  </p>
+
+                  <div className="flex items-center gap-[6.5px]">
+                    <Image src={badge} alt="badge" width={28} height={28} />
+                    <p className="text-[#E0E0E0] text-[15px] font-[500] leading-[22px]">
+                      {users[2].xp || 0} XP
+                    </p>
+                  </div>
+              </div>
+            )}
+        </div>
+      </div>
+
+
+      <div className="mt-12 px-6">
+        <div className={`rounded-2xl border ${
+          theme === "dark" 
+            ? "bg-[#131313] border-[#2E3033]" 
+            : "bg-white border-[#E0E7F0]"
+        }`}>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center w-full py-12 gap-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00FF80]"></div>
+              <p className={`text-sm ${theme === "dark" ? "text-[#B3B3B3]" : "text-[#61728C]"}`}>
+                Loading leaderboard...
+              </p>
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center w-full py-12 gap-3">
+              <p className={`text-center ${theme === "dark" ? "text-[#E0E0E0]" : "text-[#2D3C52]"}`}>
+                {error}
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  theme === "dark"
+                    ? "bg-[#00FF80] text-black hover:bg-[#00E070]"
+                    : "bg-[#00FF80] text-black hover:bg-[#00E070]"
+                }`}
+              >
+                Try Again
+              </button>
+            </div>
+          ) : users.length === 0 ? (
+            <div className="flex flex-col items-center justify-center w-full py-12 gap-3">
+              <p className={`text-center ${theme === "dark" ? "text-[#E0E0E0]" : "text-[#2D3C52]"}`}>
+                No users found in the leaderboard.
+              </p>
+            </div>
+          ) : (
+            <Table>
+            <TableHeader>
+              <TableRow className={`h-16 px-6 ${
+                theme === "dark" 
+                  ? "border-[#2E3033] hover:bg-[#1A1A1A]" 
+                  : "border-[#E0E7F0] hover:bg-gray-50"
+              }`}>
+                <TableHead className={`font-[500] leading-[24px] text-[16px] ${
+                  theme === "dark" ? "text-[#E0E0E0]" : "text-[#61728C]"
+                }`}>
+                  Rank
+                </TableHead>
+                <TableHead className={`font-[500] leading-[24px] text-[16px] ${
+                  theme === "dark" ? "text-[#E0E0E0]" : "text-[#61728C]"
+                }`}>
+                  Name
+                </TableHead>
+                <TableHead className={`font-[500] leading-[24px] text-[16px] ${
+                  theme === "dark" ? "text-[#E0E0E0]" : "text-[#61728C]"
+                }`}>
+                  XP
+                </TableHead>
+                <TableHead className={`font-[500] leading-[24px] text-[16px] ${
+                  theme === "dark" ? "text-[#E0E0E0]" : "text-[#61728C]"
+                }`}>
+                  Streak
+                </TableHead>
+                <TableHead className={`font-[500] leading-[24px] text-[16px] ${
+                  theme === "dark" ? "text-[#E0E0E0]" : "text-[#61728C]"
+                }`}>
+                  Level
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {usersToDisplay.map((user) => {
+                const isCurrentUser = user.id === currentUserId;
+                return (
+                  <TableRow 
+                    key={user.id}
+                    className={`h-16 px-6 ${
+                      isCurrentUser
+                        ? "bg-[#00FF80] border-[#00FF80] hover:bg-[#00FF80]"
+                        : theme === "dark" 
+                          ? "border-[#2E3033] hover:bg-[#1A1A1A]" 
+                          : "border-[#E0E7F0] hover:bg-gray-50"
+                    }`}
+                  >
+                    <TableCell>
+                      <p className={`text-[14px] leading-[24px] font-[500] ${
+                        isCurrentUser ? "text-[#000]" : "text-[#B3B3B3]"
+                      }`}>{user.rank}</p>
+                    </TableCell>
+                    <TableCell>
+                      <p className={`text-[14px] leading-[24px] font-[500] ${
+                        isCurrentUser ? "text-[#000]" : "text-[#B3B3B3]"
+                      }`}>{user.name}</p>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Image
+                          src={badge}
+                          alt="medal"
+                          width={16}
+                          height={16}
+                          className="mr-1"
+                        />
+                        <span className={`text-[14px] leading-[24px] font-[500] ${
+                          isCurrentUser ? "text-[#000]" : "text-[#B3B3B3]"
+                        }`}>
+                          {user.xp || 0} XP
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Image
+                          src={fire}
+                          alt="fire"
+                          width={16}
+                          height={16}
+                          className="mr-1"
+                        />
+                        <span className={`text-[14px] leading-[24px] font-[500] ${
+                          isCurrentUser ? "text-[#000]" : "text-[#B3B3B3]"
+                        }`}>
+                          {user.streak || 0}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <p className={`text-[14px] leading-[24px] font-[500] ${
+                        isCurrentUser ? "text-[#000]" : "text-[#B3B3B3]"
+                      }`}>
+                        {user.level ? user.level.charAt(0).toUpperCase() + user.level.slice(1).toLowerCase() : 'Novice'}
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+          )}
+        </div>
+
+        {!loading && !error && users.length > 0 && (
+          <div className="flex justify-between items-center mt-6">
+          <div className={`text-sm ${
+            theme === "dark" ? "text-[#B3B3B3]" : "text-[#61728C]"
+          }`}>
+            Showing {startIndex + 1}-{Math.min(endIndex, tableUsers.length)} of {tableUsers.length} results
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                currentPage === 1
+                  ? `${
+                      theme === "dark" 
+                        ? "text-[#666] cursor-not-allowed" 
+                        : "text-gray-400 cursor-not-allowed"
+                    }`
+                  : `${
+                      theme === "dark"
+                        ? "text-[#E0E0E0] hover:text-[#00FF80]"
+                        : "text-[#2D3C52] hover:text-[#00FF80]"
+                    }`
+              }`}
+            >
+              Prev page
+            </button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const pageNum = i + 1;
+                const isCurrentPage = pageNum === currentPage;
+                
+                return (
+                  <button
+                    key={pageNum}
+                    onClick={() => handlePageChange(pageNum)}
+                    className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
+                      isCurrentPage
+                        ? "bg-[#00FF80] text-black"
+                        : `${
+                            theme === "dark"
+                              ? "text-[#E0E0E0] hover:bg-[#1A1A1A]"
+                              : "text-[#2D3C52] hover:bg-gray-100"
+                          }`
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                currentPage === totalPages
+                  ? `${
+                      theme === "dark" 
+                        ? "text-[#666] cursor-not-allowed" 
+                        : "text-gray-400 cursor-not-allowed"
+                    }`
+                  : `${
+                      theme === "dark"
+                        ? "text-[#E0E0E0] hover:text-[#00FF80]"
+                        : "text-[#2D3C52] hover:text-[#00FF80]"
+                    }`
+              }`}
+            >
+              Next page
+            </button>
+          </div>
+        </div>
+        )}
+      </div>
     </div>
   )
 }

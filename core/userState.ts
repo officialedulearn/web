@@ -36,19 +36,25 @@ const calculateAndUpdateStreak = async (user: User, lastSignInAt: string | undef
     const lastActive = new Date(lastSignInAt);
     const now = new Date();
     
-    const hoursDiff = (now.getTime() - lastActive.getTime()) / (1000 * 60 * 60);
+    const lastActiveDate = lastActive.toISOString().split('T')[0];
+    const todayDate = now.toISOString().split('T')[0];
+    
+    const lastActiveDateObj = new Date(lastActiveDate);
+    const todayDateObj = new Date(todayDate);
+    const daysDiff = Math.floor((todayDateObj.getTime() - lastActiveDateObj.getTime()) / (1000 * 60 * 60 * 24));
     
     let newStreak: number;
     
-    if (hoursDiff > 24) {
-      newStreak = 1;
-    } else {
+    if (daysDiff === 0) {
       newStreak = user.streak || 1;
+    } else if (daysDiff === 1) {
+      newStreak = (user.streak || 0) + 1;
+    } else {
+      newStreak = 1;
     }
     
     await userService.updateUserStreak(user.id, newStreak);
     
-    // Award streak bonus for 3+ day streaks
     if (newStreak >= 3) {
       await activityService.createActivity({
         userId: user.id, 
@@ -180,7 +186,6 @@ const useUserStore = create<UserState>((set, get) => ({
   logout: async () => {
     try {
       await supabase.auth.signOut();
-      // Clear reviewer flag when logging out
       if (typeof window !== "undefined") {
         localStorage.removeItem('isReviewer');
       }

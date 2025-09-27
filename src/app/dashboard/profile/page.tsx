@@ -11,7 +11,9 @@ import nft from "@/../public/assets/icons/dark/nft.png";
 import brain from "@/../public/assets/icons/brain02.png";
 import fire from "@/../public/assets/icons/fire.png";
 import { WalletService } from "@/../services/wallet.service";
+import { UserService } from "@/../services/user.service";
 import congrats from "@/../public/assets/icons/congrats.png";
+import walletIcon from "@/../public/assets/icons/wallet.png";
 import useActivityStore from "@/../core/activityState";
 import {
   Dialog,
@@ -20,11 +22,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import userIcon from "@/../public/assets/icons/user.png";
+import warningIcon from "@/../public/assets/icons/warning.png";
 
 const levels = ["novice", "beginner", "intermediate", "advanced", "expert"];
 
 export default function ProfilePage() {
   const user = useUserStore((s) => s.user);
+  const setUser = useUserStore((s) => s.setUser);
   const walletBalance = useUserStore((state) => state.walletBalance);
   const fetchWalletBalance = useUserStore((state) => state.fetchWalletBalance);
   const { activities, quizActivities, fetchActivities, fetchQuizActivities } = useActivityStore();
@@ -34,8 +39,25 @@ export default function ProfilePage() {
   const [buySuccessModalVisible, setBuySuccessModalVisible] = useState(false);
   const [transactionLink, setTransactionLink] = useState<string>("");
   const [isBuying, setIsBuying] = useState(false);
+  const [isBurning, setIsBurning] = useState(false);
+  const [isStaking, setIsStaking] = useState(false);
+  const [burnSuccessModalVisible, setBurnSuccessModalVisible] = useState(false);
+
+  const [editProfileModalVisible, setEditProfileModalVisible] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: user?.name || "",
+    username: user?.username || "",
+    learning: user?.learning || ""
+  });
+  const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
+
+  const [exportWalletModalVisible, setExportWalletModalVisible] = useState(false);
+  const [confirmExportModalVisible, setConfirmExportModalVisible] = useState(false);
+  const [privateKey, setPrivateKey] = useState<string | null>(null);
+  const [isExportingWallet, setIsExportingWallet] = useState(false);
 
   const walletService = new WalletService();
+  const userService = new UserService();
 
   const getActiveDays = (streak: number) => {
     const todayIndex = new Date().getDay();
@@ -99,6 +121,20 @@ export default function ProfilePage() {
     }
   };
 
+  const handleBurnTokens = async () => {
+    try {
+      setIsBurning(true);
+      await walletService.burnEDLN(user?.id || "", 1000);
+      await userService.incrementCredits(user?.id || "", 3);
+      await fetchWalletBalance();
+      setIsBurning(false);
+      setBurnSuccessModalVisible(true);
+    } catch (error: any) {
+      console.error("Error burning tokens:", error);
+      setIsBurning(false);
+    }
+  };
+
   const copyToClipboard = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
@@ -107,90 +143,254 @@ export default function ProfilePage() {
     }
   };
 
+  const handleEditProfile = () => {
+    setEditFormData({
+      name: user?.name || "",
+      username: user?.username || "",
+      learning: user?.learning || ""
+    });
+    setEditProfileModalVisible(true);
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!editFormData.name.trim() || !editFormData.username.trim()) {
+      alert("Name and username cannot be empty");
+      return;
+    }
+
+    setIsUpdatingProfile(true);
+
+    try {
+      const updatedUser = await userService.editUser({
+        name: editFormData.name,
+        email: user?.email as string,
+        username: editFormData.username,
+        learning: editFormData.learning
+      });
+      
+      if (user) {
+        setUser({
+          ...user,
+          name: updatedUser.name,
+          username: updatedUser.username,
+          learning: updatedUser.learning
+        });
+      }
+
+      alert("Profile updated successfully!");
+      setEditProfileModalVisible(false);
+
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+      alert(error instanceof Error ? error.message : "Failed to update profile. Please try again.");
+    } finally {
+      setIsUpdatingProfile(false);
+    }
+  };
+
+  const handleExportWallet = () => {
+    setConfirmExportModalVisible(true);
+  };
+
+  const confirmExportWallet = async () => {
+    if (!user?.id) {
+      alert("User information not available");
+      return;
+    }
+    setConfirmExportModalVisible(false);
+    setIsExportingWallet(true);
+    
+    try {
+      const response = await walletService.decryptPrivateKey(user.id);
+      if (response.success) {
+        setPrivateKey(response.privateKey || null);
+        setExportWalletModalVisible(true);
+      } else {
+        alert(response.error || "Failed to export private key");
+      }
+    } catch (error) {
+      console.error("Error exporting private key:", error);
+      alert("Failed to export private key. Please try again later.");
+    } finally {
+      setIsExportingWallet(false);
+    }
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between bg-[#00FF80] rounded-[24px] py-[20px] px-[24px]">
-        <div className="flex items-start gap-[14px]">
-          <Image
-            src={avatar}
-            className="rounded-[27px]"
-            alt="user image"
-            height={95}
-            width={95}
-          />
-          <div className="flex flex-col items-start gap-[12px]">
-            <p className="text-[#000] text-[17px] font-[500] leading-[26px] text-center">
-              {user?.name}
-            </p>
-            <div className="relative">
+      <div className="bg-[#00FF80] rounded-[24px] py-[20px] px-[24px]">
+        <div className="flex flex-col gap-[12px] md:hidden">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-[14px]">
               <Image
-                src={levelHolder}
-                alt="level holder"
-                height={50}
-                width={45}
+                src={avatar}
+                className="rounded-[27px]"
+                alt="user image"
+                height={42}
+                width={42}
               />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <p
-                  className="text-[#000] font-[900]"
-                  style={{
-                    fontSize: "26.966px",
-                    lineHeight: "21.289px",
-                  }}
-                >
-                  {levels.indexOf(user?.level?.toLowerCase() || "novice") + 1}
+              <div className="flex-1">
+                <p className="text-[#000] text-[16px] font-[500] leading-[22px] truncate">
+                  {user?.name}
                 </p>
               </div>
             </div>
+            
+            <div className="flex items-center gap-[8px]">
+              <div className="relative">
+                <Image
+                  src={levelHolder}
+                  alt="level holder"
+                  height={24}
+                  width={24}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p className="text-[#000] font-[700] text-[14px]">
+                    {levels.indexOf(user?.level?.toLowerCase() || "novice") + 1}
+                  </p>
+                </div>
+              </div>
+              <p className="text-[#000] text-[12px] font-[500]">{user?.level}</p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-[7px]">
-            <Image src={badge} alt="badge" height={28} width={28} />
-            <p className="text-[#000] text-[15px] font-[500] leading-[22px]">
-              {user?.xp} XP
-            </p>
+          <div className="flex items-center justify-center">
+            <div className="flex items-center gap-[3px]">
+              <Image src={badge} alt="badge" height={24} width={24} />
+              <p className="text-[#000] text-[14px] font-[500] leading-[22px]">
+                {user?.xp} XP
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-[rgba(255,255,255,0.6)] rounded-[16px] p-[12px]">
+            <div className="flex items-center justify-between mb-[12px]">
+              <div className="flex items-center gap-[8px] flex-1">
+                <Image src={wallet} alt="wallet" height={24} width={24} />
+                <p className="text-[#000] text-[14px] font-[500] leading-[22px] truncate flex-1">
+                  {user?.address}
+                </p>
+                <button
+                  onClick={() => copyToClipboard(user?.address || "")}
+                  className="p-1 hover:bg-black/10 rounded transition-colors flex-shrink-0"
+                >
+                  <Image src={copy} alt="copy" height={16} width={16} />
+                </button>
+              </div>
+            </div>
+            
+            <div className="text-center mb-[5px]">
+              <p className="text-[#61728C] text-[12px] font-[400] leading-[16px]">Balance</p>
+            </div>
+            
+            <div className="flex items-center justify-center gap-[10px]">
+              <div className="flex flex-col items-center px-[15px]">
+                <p className="text-[#000] text-[18px] font-[700] leading-[20px] mb-[2px]">
+                  {walletBalance?.sol?.toFixed(4) || "0.0000"}
+                </p>
+                <p className="text-[#61728C] text-[12px] font-[500] leading-[16px]">SOL</p>
+              </div>
+              
+              <button
+                onClick={toggleBuyModal}
+                className="w-[28px] h-[28px] rounded-full bg-[#00FF80] flex items-center justify-center hover:bg-[#00CC66] transition-colors flex-shrink-0"
+              >
+                <span className="text-[#000] text-[18px] font-[700] leading-[20px]">+</span>
+              </button>
+              
+              <div className="flex flex-col items-center px-[15px]">
+                <p className="text-[#000] text-[18px] font-[700] leading-[20px] mb-[2px]">
+                  {walletBalance?.tokenAccount?.toFixed(2) || "0.00"}
+                </p>
+                <p className="text-[#61728C] text-[12px] font-[500] leading-[16px]">EDLN</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-[12px] bg-[rgba(255,255,255,0.6)] rounded-[16px] p-[12px]">
-          <div className="flex items-center gap-[8px]">
-            <Image src={wallet} alt="wallet" height={28} width={28} />
-            <p className="text-[#000] text-[14px] font-[500] leading-[22px] max-w-[120px] truncate">
-              {user?.address}
-            </p>
-            <button
-              onClick={() => copyToClipboard(user?.address || "")}
-              className="p-1 hover:bg-black/10 rounded transition-colors"
-            >
-              <Image src={copy} alt="copy" height={16} width={16} />
-            </button>
-          </div>
-          
-          <div className="flex items-center justify-center gap-[10px]">
-            <div className="flex flex-col items-center">
-              <p className="text-[#000] text-[16px] font-[700] leading-[20px]">
-                {walletBalance?.sol?.toFixed(4) || "0.0000"}
+        <div className="hidden md:flex items-center justify-between">
+          <div className="flex items-start gap-[14px]">
+            <Image
+              src={avatar}
+              className="rounded-[27px]"
+              alt="user image"
+              height={95}
+              width={95}
+            />
+            <div className="flex flex-col items-start gap-[12px]">
+              <p className="text-[#000] text-[17px] font-[500] leading-[26px] text-center">
+                {user?.name}
               </p>
-              <p className="text-[#61728C] text-[12px] font-[500] leading-[16px]">SOL</p>
+              <div className="relative">
+                <Image
+                  src={levelHolder}
+                  alt="level holder"
+                  height={50}
+                  width={45}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <p
+                    className="text-[#000] font-[900]"
+                    style={{
+                      fontSize: "26.966px",
+                      lineHeight: "21.289px",
+                    }}
+                  >
+                    {levels.indexOf(user?.level?.toLowerCase() || "novice") + 1}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-[7px]">
+              <Image src={badge} alt="badge" height={28} width={28} />
+              <p className="text-[#000] text-[15px] font-[500] leading-[22px]">
+                {user?.xp} XP
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-[12px] bg-[rgba(255,255,255,0.6)] rounded-[16px] p-[12px]">
+            <div className="flex items-center gap-[8px]">
+              <Image src={wallet} alt="wallet" height={28} width={28} />
+              <p className="text-[#000] text-[14px] font-[500] leading-[22px] max-w-[120px] truncate">
+                {user?.address}
+              </p>
+              <button
+                onClick={() => copyToClipboard(user?.address || "")}
+                className="p-1 hover:bg-black/10 rounded transition-colors"
+              >
+                <Image src={copy} alt="copy" height={16} width={16} />
+              </button>
             </div>
             
-            <button
-              onClick={toggleBuyModal}
-              className="w-[28px] h-[28px] rounded-full bg-[#00FF80] flex items-center justify-center hover:bg-[#00CC66] transition-colors"
-            >
-              <span className="text-[#000] text-[18px] font-[700] leading-[20px]">+</span>
-            </button>
-            
-            <div className="flex flex-col items-center">
-              <p className="text-[#000] text-[16px] font-[700] leading-[20px]">
-                {walletBalance?.tokenAccount?.toFixed(2) || "0.00"}
-              </p>
-              <p className="text-[#61728C] text-[12px] font-[500] leading-[16px]">EDLN</p>
+            <div className="flex items-center justify-center gap-[10px]">
+              <div className="flex flex-col items-center">
+                <p className="text-[#000] text-[16px] font-[700] leading-[20px]">
+                  {walletBalance?.sol?.toFixed(4) || "0.0000"}
+                </p>
+                <p className="text-[#61728C] text-[12px] font-[500] leading-[16px]">SOL</p>
+              </div>
+              
+              <button
+                onClick={toggleBuyModal}
+                className="w-[28px] h-[28px] rounded-full bg-[#00FF80] flex items-center justify-center hover:bg-[#00CC66] transition-colors"
+              >
+                <span className="text-[#000] text-[18px] font-[700] leading-[20px]">+</span>
+              </button>
+              
+              <div className="flex flex-col items-center">
+                <p className="text-[#000] text-[16px] font-[700] leading-[20px]">
+                  {walletBalance?.tokenAccount?.toFixed(2) || "0.00"}
+                </p>
+                <p className="text-[#61728C] text-[12px] font-[500] leading-[16px]">EDLN</p>
+              </div>
             </div>
           </div>
         </div>
       </div>  
 
-      <div className="mt-[16px] grid grid-cols-2 lg:grid-cols-4 gap-[16px]">
+      <div className="mt-[16px] grid grid-cols-2 md:grid-cols-4 gap-[16px]">
         <div className="bg-[#1A1A1A] dark:bg-[#1A1A1A] border border-[#2E2E2E] dark:border-[#2E2E2E] rounded-lg p-4 flex flex-col items-center justify-center h-[160px]">
           <div className="flex flex-col items-center gap-2 mb-4">
             <div className="w-8 h-8 bg-[#2E2E2E] rounded-lg flex items-center justify-center">
@@ -268,41 +468,100 @@ export default function ProfilePage() {
         </div>
       </div>
 
-      <div className=" flex items-center justify-between mt-[16px] bg-[#1A1A1A] dark:bg-[#1A1A1A] border border-[#2E2E2E] dark:border-[#2E2E2E] rounded-[24px] p-[16px]">
-        <div className="flex items-center gap-[16px] mb-[16px]">
-          <Image
-            src={congrats}
-            alt="Invite friends"
-            width={62}
-            height={62}
-          />
-          <div className="flex flex-col gap-[4px] flex-1">
-            <h3 className="text-[#E0E0E0] text-[16px] font-[500] leading-[22px]">
-              Invite friends, earn rewards!
-            </h3>
-            <p className="text-[#B3B3B3] text-[14px] font-[400] leading-[24px]">
-              Share your referral link and earn XP when they join. Plus, earn 20% of payments from users you invite that upgrade to premium!
+      <div className="mt-[16px] bg-[#1A1A1A] dark:bg-[#1A1A1A] border border-[#2E2E2E] dark:border-[#2E2E2E] rounded-[24px] p-[16px]">
+        <div className="flex items-center justify-between gap-[24px]">
+          <div className="flex items-center gap-[16px]">
+            <Image
+              src={congrats}
+              alt="Invite friends"
+              width={62}
+              height={62}
+            />
+            <div className="flex flex-col gap-[4px] flex-1">
+              <h3 className="text-[#E0E0E0] text-[16px] font-[500] leading-[22px]">
+                Invite friends, earn rewards!
+              </h3>
+              <p className="text-[#B3B3B3] text-[14px] font-[400] leading-[18px] md:leading-[24px]">
+                Share your referral link and earn XP when they join.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-center bg-[#2E2E2E] dark:bg-[#2E2E2E] border border-[#2E2E2E] dark:border-[#2E2E2E] rounded-[16px] py-[8px] pl-[24px] pr-[12px]">
+            <p className="text-[#E0E0E0] text-[16px] font-[500] leading-[24px]">
+              {user?.referralCode}
             </p>
+            <button
+              onClick={() => copyToClipboard(user?.referralCode || "")}
+              className="flex items-center gap-[8px] hover:bg-[#3E3E3E] rounded-[8px] px-[8px] py-[4px] transition-colors ml-auto"
+            >
+              <span className="text-[#B3B3B3] text-[16px] font-[400] leading-[26px]">Copy Code</span>
+              <Image
+                src={copy}
+                alt="copy"
+                width={16}
+                height={16}
+              />
+            </button>
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center justify-between bg-[#2E2E2E] dark:bg-[#2E2E2E] border border-[#2E2E2E] dark:border-[#2E2E2E] rounded-[16px] py-[8px] pl-[24px] pr-[12px]">
-          <p className="text-[#E0E0E0] text-[16px] font-[500] leading-[24px]">
-            {user?.referralCode}
-          </p>
+      <div className="mt-[16px] flex flex-col gap-[16px]">
+        <div className="bg-[#1A1A1A] dark:bg-[#131313] border border-[#2E2E2E] dark:border-[#2E3033] rounded-[16px] p-[20px] flex flex-col md:flex-row items-center justify-between gap-[16px]">
+          <div className="flex-1 text-center md:text-left">
+            <p className="text-[#E0E0E0] text-[16px] font-[500] leading-[24px]">
+              Burn 1000 $EDLN and get 3 credits
+            </p>
+          </div>
           <button
-            onClick={() => copyToClipboard(user?.referralCode || "")}
-            className="flex items-center gap-[8px] hover:bg-[#3E3E3E] rounded-[8px] px-[8px] py-[4px] transition-colors"
+            onClick={handleBurnTokens}
+            disabled={isBurning}
+            className="bg-[#000000] dark:bg-[#00FF80] text-[#00FF80] dark:text-[#000000] px-[20px] py-[10px] rounded-[12px] font-[500] text-[16px] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors disabled:opacity-70 flex items-center justify-center min-w-[80px] min-h-[40px]"
           >
-            <span className="text-[#B3B3B3] text-[16px] font-[400] leading-[26px]">Copy</span>
-            <Image
-              src={copy}
-              alt="copy"
-              width={16}
-              height={16}
-            />
+            {isBurning ? (
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#00FF80] dark:border-[#000000]"></div>
+            ) : (
+              "Burn"
+            )}
           </button>
         </div>
+
+        <div className="bg-[#1A1A1A] dark:bg-[#131313] border border-[#2E2E2E] dark:border-[#2E3033] rounded-[16px] p-[20px] flex flex-col md:flex-row items-center justify-between gap-[16px]">
+          <div className="flex-1 text-center md:text-left">
+            <p className="text-[#E0E0E0] text-[16px] font-[500] leading-[24px]">
+              Stake 5000 $EDLN for 30 days and earn 500 XP
+            </p>
+          </div>
+          <button
+            disabled={true}
+            className="bg-transparent border border-[#61728C] text-[#61728C] px-[20px] py-[10px] rounded-[12px] font-[500] text-[16px] cursor-not-allowed min-w-[80px] min-h-[40px]"
+          >
+            Coming Soon
+          </button>
+        </div>
+      </div>
+
+      <div className="rounded-[24px] border border-[#2E3033] bg-[#131313] gap-[24px] p-[16px] items-start flex-col mt-[16px]">
+            <p className="text-[#E0E0E0] text-[20px] font-[500] leading-[30px]">Settings</p>
+
+            <div className="flex items-center justify-between gap-[16px]">
+              <button 
+                onClick={handleEditProfile}
+                className="flex items-center gap-[12px] bg-transparent border border-[#00FF80] py-[10px] px-[16px] rounded-[8px] w-full hover:bg-[#00FF80] hover:bg-opacity-10 transition-colors"
+              >
+                <Image src={userIcon} alt="user" width={20} height={20} />
+                <p className="text-[#00FF80] text-[16px] font-[500] leading-[24px]">Edit Profile Info</p>
+              </button>
+
+              <button 
+                onClick={handleExportWallet}
+                className="flex items-center gap-[12px] bg-transparent border border-[#00FF80] py-[10px] px-[16px] rounded-[8px] w-full hover:bg-[#00FF80] hover:bg-opacity-10 transition-colors"
+              >
+                <Image src={walletIcon} alt="user" width={20} height={20} />
+                <p className="text-[#00FF80] text-[16px] font-[500] leading-[24px]">Export Secret Key</p>
+              </button>
+            </div>
       </div>
 
       <Dialog open={isBuyModalVisible} onOpenChange={setBuyModalVisible}>
@@ -395,6 +654,191 @@ export default function ProfilePage() {
               Close
             </button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editProfileModalVisible} onOpenChange={setEditProfileModalVisible}>
+        <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-[#2D3C52] dark:text-[#E0E0E0] text-[20px] font-[700] text-center mb-4">
+              Edit Profile
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="flex flex-col gap-[16px]">
+            <div className="flex flex-col gap-[8px]">
+              <label className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">Full Name</label>
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                value={editFormData.name}
+                onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                disabled={isUpdatingProfile}
+                className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[12px] w-full text-[16px] font-[400] text-[#2D3C52] dark:text-[#E0E0E0] placeholder:text-[#61728C] dark:placeholder:text-[#B3B3B3] focus:outline-none focus:ring-2 focus:ring-[#00FF80] focus:border-transparent disabled:opacity-50"
+              />
+            </div>
+
+            <div className="flex flex-col gap-[8px]">
+              <label className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">Username</label>
+              <input
+                type="text"
+                placeholder="Enter your username"
+                value={editFormData.username}
+                onChange={(e) => setEditFormData({...editFormData, username: e.target.value})}
+                disabled={isUpdatingProfile}
+                className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[12px] w-full text-[16px] font-[400] text-[#2D3C52] dark:text-[#E0E0E0] placeholder:text-[#61728C] dark:placeholder:text-[#B3B3B3] focus:outline-none focus:ring-2 focus:ring-[#00FF80] focus:border-transparent disabled:opacity-50"
+              />
+            </div>
+
+            <div className="flex flex-col gap-[8px]">
+              <label className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">What are you learning?</label>
+              <input
+                type="text"
+                placeholder="blockchain basics, web3 design, smart contracts..."
+                value={editFormData.learning}
+                onChange={(e) => setEditFormData({...editFormData, learning: e.target.value})}
+                disabled={isUpdatingProfile}
+                maxLength={100}
+                className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[12px] w-full text-[16px] font-[400] text-[#2D3C52] dark:text-[#E0E0E0] placeholder:text-[#61728C] dark:placeholder:text-[#B3B3B3] focus:outline-none focus:ring-2 focus:ring-[#00FF80] focus:border-transparent disabled:opacity-50"
+              />
+            </div>
+
+            <div className="flex gap-[16px] mt-[16px]">
+              <button
+                onClick={() => setEditProfileModalVisible(false)}
+                disabled={isUpdatingProfile}
+                className="bg-[#FFFFFF] dark:bg-[#000000] border border-[#000000] dark:border-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#000000] dark:text-[#00FF80] text-[16px] font-[700] hover:bg-[#F9FBFC] dark:hover:bg-[#1A1A1A] transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleUpdateProfile}
+                disabled={isUpdatingProfile}
+                className="bg-[#000000] dark:bg-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#00FF80] dark:text-[#000000] text-[16px] font-[700] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors disabled:opacity-50 flex items-center justify-center"
+              >
+                {isUpdatingProfile ? (
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#00FF80] dark:border-[#000000]"></div>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Wallet Confirmation Modal */}
+      <Dialog open={confirmExportModalVisible} onOpenChange={setConfirmExportModalVisible}>
+        <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md flex items-center flex-col">
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-[60px] h-[60px] rounded-full bg-[#FFF9F0] dark:bg-[rgba(255,176,32,0.1)] border border-[#FFB020] flex items-center justify-center">
+                <Image src={warningIcon} alt="warning" width={30} height={30} />
+              </div>
+            </div>
+            <DialogTitle className="text-[#2D3C52] dark:text-[#E0E0E0] text-[20px] font-[700] mb-2 text-center">
+              Security Warning
+            </DialogTitle>
+            <DialogDescription className="text-[#61728C] dark:text-[#B3B3B3] text-[16px] font-[400] leading-[24px] text-center mb-6">
+              Are you sure you want to export your private key? This key provides complete access to your wallet and funds.
+              Only proceed if you are in a secure location.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex gap-[16px] w-full">
+            <button
+              onClick={() => setConfirmExportModalVisible(false)}
+              className="bg-[#FFFFFF] dark:bg-[#2E3033] border border-[#000000] dark:border-[#2E3033] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#000000] dark:text-[#E0E0E0] text-[16px] font-[500] hover:bg-[#F9FBFC] dark:hover:bg-[#3E3E3E] transition-colors"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={confirmExportWallet}
+              disabled={isExportingWallet}
+              className="bg-[#000000] dark:bg-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#00FF80] dark:text-[#000000] text-[16px] font-[700] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors disabled:opacity-50 flex items-center justify-center"
+            >
+              {isExportingWallet ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#00FF80] dark:border-[#000000]"></div>
+              ) : (
+                "Confirm"
+              )}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Export Wallet Private Key Modal */}
+      <Dialog open={exportWalletModalVisible} onOpenChange={setExportWalletModalVisible}>
+        <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md flex items-center flex-col">
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-[60px] h-[60px] rounded-full bg-[#FFF9F0] dark:bg-[rgba(255,176,32,0.1)] border border-[#FFB020] flex items-center justify-center">
+                <Image src={warningIcon} alt="warning" width={30} height={30} />
+              </div>
+            </div>
+            <DialogTitle className="text-[#2D3C52] dark:text-[#E0E0E0] text-[20px] font-[700] mb-2 text-center">
+              Your Private Key
+            </DialogTitle>
+            <DialogDescription className="text-[#61728C] dark:text-[#B3B3B3] text-[16px] font-[400] leading-[24px] text-center mb-6">
+              Keep this private key secure. Anyone with access to this key will have full control over your wallet.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex flex-col gap-[16px] w-full">
+            <div className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[16px] w-full">
+              <p className="text-[#2D3C52] dark:text-[#E0E0E0] text-[14px] font-[400] break-all select-all">
+                {privateKey}
+              </p>
+            </div>
+            
+            <button
+              onClick={() => copyToClipboard(privateKey || "")}
+              className="bg-[#000000] dark:bg-[#00FF80] text-[#00FF80] dark:text-[#000000] px-[24px] py-[12px] rounded-[16px] font-[700] text-[16px] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors flex items-center justify-center gap-[8px]"
+            >
+              <Image src={copy} alt="copy" width={16} height={16} />
+              <span>Copy to clipboard</span>
+            </button>
+            
+            <button
+              onClick={() => {
+                setExportWalletModalVisible(false);
+                setPrivateKey(null);
+              }}
+              className="bg-transparent text-[#000000] dark:text-[#E0E0E0] px-[24px] py-[12px] rounded-[16px] font-[500] text-[16px] border border-[#000000] dark:border-[#2E3033] hover:bg-[#F9FBFC] dark:hover:bg-[#2E3033] transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Burn Success Modal */}
+      <Dialog open={burnSuccessModalVisible} onOpenChange={setBurnSuccessModalVisible}>
+        <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md flex items-center flex-col">
+          <DialogHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="w-[60px] h-[60px] rounded-full bg-[#F0FFF9] dark:bg-[rgba(0,255,128,0.1)] border border-[#00FF80] flex items-center justify-center">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L13.09 8.26L19 7L15.74 12L19 17L13.09 15.74L12 22L10.91 15.74L5 17L8.26 12L5 7L10.91 8.26L12 2Z" fill="#00FF80"/>
+                </svg>
+              </div>
+            </div>
+            <DialogTitle className="text-[#2D3C52] dark:text-[#E0E0E0] text-[20px] font-[700] mb-2 text-center">
+              Tokens Burned Successfully!
+            </DialogTitle>
+            <DialogDescription className="text-[#61728C] dark:text-[#B3B3B3] text-[16px] font-[400] leading-[24px] text-center mb-6">
+              You've received 3 credits and your wallet balance has been updated.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <button
+            onClick={() => setBurnSuccessModalVisible(false)}
+            className="bg-[#000000] dark:bg-[#00FF80] text-[#00FF80] dark:text-[#000000] px-[32px] py-[12px] rounded-[16px] font-[700] text-[16px] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors w-full"
+          >
+            OK
+          </button>
         </DialogContent>
       </Dialog>
     </div>
