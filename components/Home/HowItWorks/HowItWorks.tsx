@@ -87,7 +87,7 @@ const HowItWorks = (props: Props) => {
             <div className="max-w-lg">
               <p className="text-[#E0E0E0] text-xl md:text-2xl lg:text-[32px] leading-[32px] md:leading-[44px] font-[500]">Earn XP & Unlock Rewards</p>
               <p className="opacity-[0.7] text-[#B3B3B3] text-base md:text-lg lg:text-[20px] leading-[24px] md:leading-[30px] font-normal mt-2">
-                Get instant XP for correct answers. Unlock exclusive NFTs and claim $EDLN and $SOL
+                Get instant XP for correct answers. Unlock exclusive NFTs and claim $USDC
               </p>
             </div>
           </div>

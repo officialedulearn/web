@@ -277,8 +277,9 @@ export default function RewardsPage() {
         ) : rewards.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-[16px] w-full">
             {rewards.slice(0, 4).map((reward, index) => (
-              <div
+              <Link
                 key={reward.id || index}
+                href={`/dashboard/nft/${reward.id}`}
                 className="flex flex-col bg-[#1A1A1A] border border-[#2E3033] rounded-[8px] p-[4px] hover:border-[#00FF80] transition-colors cursor-pointer"
               >
                 <div className="relative w-full aspect-square bg-gray-300 rounded-[8px] overflow-hidden mb-[8px]">
@@ -318,7 +319,7 @@ export default function RewardsPage() {
                     </p>
                   </div>
                 )}
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

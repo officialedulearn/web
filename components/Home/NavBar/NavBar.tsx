@@ -107,10 +107,10 @@ const NavBar = (props: Props) => {
                 Why us
               </li>
               <div className="flex flex-col gap-3 mt-3">
-                <span className="border border-[#00FF80] rounded-[8px] px-[32px] py-[10px] text-[#00FF80] font-bold text-[16px] leading-normal cursor-pointer text-center">
+                <span className="border border-[#00FF80] rounded-[8px] px-[32px] py-[10px] text-[#00FF80] font-bold text-[16px] leading-normal cursor-pointer text-center" onClick={() => router.push("/auth")}>
                   Sign In
                 </span>
-                <span className="rounded-[8px] px-[32px] py-[10px] bg-[#00FF80] text-[#000000] font-bold text-[16px] leading-normal cursor-pointer text-center">
+                <span className="rounded-[8px] px-[32px] py-[10px] bg-[#00FF80] text-[#000000] font-bold text-[16px] leading-normal cursor-pointer text-center" onClick={() => router.push("/auth")}>
                   Sign Up
                 </span>
               </div>

@@ -169,7 +169,6 @@ const ChatDrawer: React.FC<ChatDrawerProps> = ({ onClose }) => {
     <>
       <style jsx>{drawerScrollbarStyles}</style>
       <div className="h-full flex flex-col bg-[#0A0A0A]">
-        {/* Mobile Close Button */}
         <div className="flex items-center justify-between p-4 border-b border-[#2E3033] md:hidden">
           <h2 className="text-lg font-medium text-white">Chat History</h2>
           <button

@@ -43,6 +43,7 @@ const calculateAndUpdateStreak = async (user: User, lastSignInAt: string | undef
     const todayDateObj = new Date(todayDate);
     const daysDiff = Math.floor((todayDateObj.getTime() - lastActiveDateObj.getTime()) / (1000 * 60 * 60 * 24));
     
+    const previousStreak = user.streak || 0;
     let newStreak: number;
     
     if (daysDiff === 0) {
@@ -55,12 +56,13 @@ const calculateAndUpdateStreak = async (user: User, lastSignInAt: string | undef
     
     await userService.updateUserStreak(user.id, newStreak);
     
-    if (newStreak >= 3) {
+
+    if (newStreak > previousStreak && newStreak >= 3) {
       await activityService.createActivity({
         userId: user.id, 
         type: "streak", 
         title: `${newStreak}-day XP Streak Bonus`, 
-        xpEarned: 5
+        xpEarned: 1
       });
     }
     

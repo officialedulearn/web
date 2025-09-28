@@ -23,7 +23,7 @@ import { usePathname } from "next/navigation";
 import XPBadge from "@/../public/assets/icons/medal01.png";
 import { Progress } from "@/components/ui/progress";
 import help from "@/../public/assets/icons//dark/help.png";
-import logout from "@/../public/assets/icons/dark/logout.png";
+import logoutIcon from "@/../public/assets/icons/dark/logout.png";
 import useUserStore from "@/../core/userState";  
 import HomeIcon from "@/../public/assets/icons/dark/home.png"
 import Chat from "@/../public/assets/icons/dark/aichat.png"
@@ -31,6 +31,7 @@ import Quizzes from "@/../public/assets/icons/dark/brain.png"
 import Rewards from "@/../public/assets/icons/dark/gift.png"
 import Leaderboard from "@/../public/assets/icons/dark/medal.png"
 import Profile from "@/../public/assets/icons/dark/user1.png"
+import { useRouter } from "next/navigation";
 
 
 const items = [
@@ -72,7 +73,7 @@ export function AppSidebar() {
   const isMobile = useIsMobile();
   const isCollapsed = state === "collapsed" && !isMobile;
   const { user } = useUserStore();
-
+  const router = useRouter();
   const milestones = {
     novice: 0,
     beginner: 500,
@@ -136,6 +137,7 @@ export function AppSidebar() {
     }
     return pathname.startsWith(url);
   };
+  const logout = useUserStore((s) => s.logout);
 
   return (
     <Sidebar
@@ -250,8 +252,11 @@ export function AppSidebar() {
               isCollapsed 
                 ? "justify-center w-[60px] h-8 mx-auto" 
                 : "px-2 py-1"
-            }`}>
-              <Image src={logout} alt="Logout" width={16} height={16} />
+            }`} onClick={() => {
+              logout();
+              router.push("/");
+            }}>
+              <Image src={logoutIcon} alt="Logout" width={16} height={16} />
               {!isCollapsed && (
                 <p className="text-[#E0E0E0] text-[14px] font-[400] leading-[20px]">
                   Logout

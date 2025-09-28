@@ -3,6 +3,7 @@ import useUserStore from "@/../core/userState";
 import calendar from "@/../public/assets/icons/dark/calendar.png";
 import Image from "next/image";
 import Cards from "../../../components/Dashboard/Cards";
+import XPChart from "@/components/XPChart";
 
 export default function DashboardPage() {
   const user = useUserStore((state) => state.user);
@@ -29,6 +30,8 @@ export default function DashboardPage() {
       </div>
 
       <Cards/> 
+      
+      <XPChart className="mt-4" />
     </div>
   );
 }

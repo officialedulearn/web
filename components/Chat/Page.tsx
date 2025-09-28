@@ -286,7 +286,7 @@ const Chat = ({ title, initialMessages = [], chatId }: Props) => {
         </div>
 
         <button
-          className="hidden md:block fixed top-4 left-4 z-30 p-2 bg-[#0A0A0A] border border-[#2E3033] rounded-lg hover:bg-[#1A1A1A] transition-colors"
+          className="md:hidden fixed top-4 left-4 z-30 p-2 bg-[#0A0A0A] border border-[#2E3033] rounded-lg hover:bg-[#1A1A1A] transition-colors"
           onClick={() => setDrawerOpen(!drawerOpen)}
         >
           <svg className="w-5 h-5 text-[#E0E0E0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +311,6 @@ const Chat = ({ title, initialMessages = [], chatId }: Props) => {
             <div className="flex items-center gap-[16px]">
             {messages.length > 0 && (
               <>
-                {/* Desktop buttons */}
                 <button
                   className="hidden md:flex cursor-pointer px-[24px] py-[10px] leading-[24px] font-[700] bg-[#00FF80] items-center gap-[12px] text-[#000] rounded-[8px] hover:bg-[#00E070] transition-colors text-sm"
                   onClick={handleStartQuiz}
@@ -327,7 +326,6 @@ const Chat = ({ title, initialMessages = [], chatId }: Props) => {
                   Delete Chat
                 </button>
                 
-                {/* Mobile buttons */}
                 <button
                   className="md:hidden flex items-center justify-center w-[40px] h-[40px] border border-[#2E3033] bg-[#131313] rounded-[7.736px] hover:bg-[#1A1A1A] transition-colors"
                   onClick={handleStartQuiz}

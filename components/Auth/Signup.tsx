@@ -177,9 +177,9 @@ const Signup = (props: Props) => {
     }
   };
   return (
-    <div className="w-screen max-w-none md:w-full md:max-w-[500px] md:px-0">
-      <div className="flex flex-col md:items-center gap-[20px] md:gap-[28px]">
-        <div className="flex items-center md:justify-center justify-start mb-2">
+    <div className="w-full max-w-lg mx-auto px-6 py-8">
+      <div className="flex flex-col items-center gap-[32px] mb-12">
+        <div className="flex items-center justify-center">
           <Image
             src="/assets/icons/LOGO.png"
             alt="EduLearn Logo"
@@ -197,12 +197,12 @@ const Signup = (props: Props) => {
             priority
           />
         </div>
-        <div className="flex flex-col md:text-center">
-          <p className="text-[#2D3C52] dark:text-[#E0E0E0] leading-[42px] font-[700] text-[20px] md:text-[24px]">
+        <div className="flex flex-col text-center ">
+          <p className="text-[#2D3C52] dark:text-[#E0E0E0] leading-[42px] font-[700] text-[24px]">
             {isLogin ? "Welcome back!" : "Create your account"}
           </p>
 
-          <p className="text-[#61728C] dark:text-[#B3B3B3] text-[16px] md:text-[18px] leading-[26px] md:text-center font-medium opacity-[0.7] mt-2">
+          <p className="text-[#61728C] dark:text-[#B3B3B3] text-[18px] leading-[26px] text-center font-medium opacity-[0.7]">
             {isLogin
               ? "Login to continue your journey"
               : "Lets get started, your Web3 AI tutor awaits"}
@@ -210,15 +210,13 @@ const Signup = (props: Props) => {
         </div>
       </div>
 
-      <div className="mt-[32px] md:mt-[48px] space-y-[20px] md:space-y-[24px]">
+      <form onSubmit={handleSubmit} className="space-y-6">
         {!isLogin && (
-          <div>
-            <div className="mb-[8px]">
-              <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px]">
-                Name
-              </label>
-            </div>
-            <div className="relative w-full max-w-full">
+          <div className="space-y-2">
+            <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px] block">
+              Name
+            </label>
+            <div className="relative w-full">
               <input
                 placeholder="Full Name"
                 type="text"
@@ -227,19 +225,17 @@ const Signup = (props: Props) => {
                 maxLength={50}
                 autoComplete="name"
                 required={!isLogin}
-                className="w-full max-w-full rounded-[8px] h-[40px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[10px] pl-[16px] pr-[16px] gap-[8px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#EDF3FC] dark:focus:border-[#2E3033]"
+                className="w-full rounded-[8px] h-[48px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[12px] pl-[16px] pr-[16px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#00FF80] dark:focus:border-[#00FF80] transition-colors"
               />
             </div>
           </div>
         )}
 
-        <div>
-          <div className="mb-[8px]">
-            <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px]">
-              Email
-            </label>
-          </div>
-          <div className="relative w-full max-w-full">
+        <div className="space-y-2">
+          <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px] block">
+            Email
+          </label>
+          <div className="relative w-full">
             <input
               placeholder="Email"
               type="email"
@@ -248,7 +244,7 @@ const Signup = (props: Props) => {
               maxLength={254}
               autoComplete="email"
               required
-              className="w-full max-w-full rounded-[8px] h-[40px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[10px] pl-[16px] pr-[44px] gap-[8px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#EDF3FC] dark:focus:border-[#2E3033]"
+              className="w-full rounded-[8px] h-[48px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[12px] pl-[16px] pr-[44px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#00FF80] dark:focus:border-[#00FF80] transition-colors"
             />
             <div className="absolute right-[16px] top-1/2 transform -translate-y-1/2 flex items-center justify-center">
               <Image
@@ -271,13 +267,11 @@ const Signup = (props: Props) => {
 
         {!isLogin && (
           <>
-            <div>
-              <div className="mb-[8px]">
-                <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px]">
-                  Referral Code (Optional)
-                </label>
-              </div>
-              <div className="relative w-full max-w-full">
+            <div className="space-y-2">
+              <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px] block">
+                Referral Code (Optional)
+              </label>
+              <div className="relative w-full">
                 <input
                   placeholder="Referral Code"
                   type="text"
@@ -287,18 +281,16 @@ const Signup = (props: Props) => {
                   }
                   maxLength={20}
                   autoComplete="off"
-                  className="w-full max-w-full rounded-[8px] h-[40px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[10px] pl-[16px] pr-[16px] gap-[8px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#EDF3FC] dark:focus:border-[#2E3033]"
+                  className="w-full rounded-[8px] h-[48px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[12px] pl-[16px] pr-[16px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#00FF80] dark:focus:border-[#00FF80] transition-colors"
                 />
               </div>
             </div>
 
-            <div>
-              <div className="mb-[8px]">
-                <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px]">
-                  X Username (Optional)
-                </label>
-              </div>
-              <div className="relative w-full max-w-full">
+            <div className="space-y-2">
+              <label className="text-[#61728C] dark:text-[#B3B3B3] font-[Satoshi] text-[16px] font-medium leading-[24px] block">
+                X Username (Optional)
+              </label>
+              <div className="relative w-full">
                 <input
                   placeholder="@username"
                   type="text"
@@ -308,7 +300,7 @@ const Signup = (props: Props) => {
                   }
                   maxLength={30}
                   autoComplete="username"
-                  className="w-full max-w-full rounded-[8px] h-[40px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[10px] pl-[16px] pr-[16px] gap-[8px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#EDF3FC] dark:focus:border-[#2E3033]"
+                  className="w-full rounded-[8px] h-[48px] dark:bg-[#131313] border-[0.75px] border-[#EDF3FC] dark:border-[#2E3033] bg-[#fff] py-[12px] pl-[16px] pr-[16px] text-[#2D3C52] dark:text-[#E0E0E0] focus:outline-none focus:ring-0 focus:border-[#00FF80] dark:focus:border-[#00FF80] transition-colors"
                 />
               </div>
             </div>
@@ -316,29 +308,29 @@ const Signup = (props: Props) => {
         )}
 
         <button
+          type="submit"
           disabled={loading}
-          className={`cursor-pointer gap-[12px] rounded-[8px] py-[12px] md:py-[10px] px-[24px] bg-[#000] text-[#00FF80] dark:text-[#000] dark:bg-[#00FF80] text-[16px] leading-[24px] font-[700] mt-[32px] md:mt-[40px] w-full flex items-center justify-center transition-opacity ${
+          className={`cursor-pointer gap-[12px] rounded-[8px] py-[14px] px-[24px] bg-[#000] text-[#00FF80] dark:text-[#000] dark:bg-[#00FF80] text-[16px] leading-[24px] font-[700] mt-8 w-full flex items-center justify-center transition-opacity ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
-          onClick={async (e) => await handleSubmit(e)}
         >
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {loading ? "Processing..." : (isLogin ? "Sign In" : "Sign Up")}
         </button>
+      </form>
 
-        <div className="flex items-center md:justify-center mt-[32px] md:mt-[40px] md:text-center gap-2">
-          <p className="text-[#61728C] dark:text-[#B3B3B3] leading-[24px] text-[16px] font-[400]">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}
-          </p>
-          <p
-            className={`text-[#2D3C52] dark:text-[#E0E0E0] underline underline-offset-[6px] decoration-solid decoration-1 decoration-[#2D3C52] dark:decoration-[#E0E0E0] cursor-pointer hover:opacity-80 transition-opacity ${
-              loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
-            }`}
-            onClick={() => !loading && setIsLogin(!isLogin)}
-          >
-            {isLogin ? "Sign Up" : "Sign In"}
-          </p>
-        </div>
+      <div className="flex items-center justify-center mt-8 text-center gap-2">
+        <p className="text-[#61728C] dark:text-[#B3B3B3] leading-[24px] text-[16px] font-[400]">
+          {isLogin ? "Don't have an account?" : "Already have an account?"}
+        </p>
+        <p
+          className={`text-[#2D3C52] dark:text-[#E0E0E0] underline underline-offset-[6px] decoration-solid decoration-1 decoration-[#2D3C52] dark:decoration-[#E0E0E0] cursor-pointer hover:opacity-80 transition-opacity ${
+            loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+          }`}
+          onClick={() => !loading && setIsLogin(!isLogin)}
+        >
+          {isLogin ? "Sign Up" : "Sign In"}
+        </p>
       </div>
     </div>
   );

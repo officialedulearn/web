@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import useUserStore from '@/../core/userState'
 import { RewardsService } from '@/../services/rewards.service'
 import { format } from 'date-fns'
@@ -92,8 +93,7 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
 
       setClaimedRewards(claimed);
       setUnclaimedRewards(unclaimed);
-
-      // Set claimed reward for success modal
+      
       setClaimedReward(selectedReward);
       setShowClaimModal(false);
       setShowSuccessModal(true);
@@ -200,78 +200,30 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
           </div>
         ) : currentRewards.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[16px] pb-[20px]">
-            {currentRewards.map((reward, index) => (
-              <div
-                key={reward.id || index}
-                className="bg-[#131313] border border-[#2E3033] rounded-[12px] p-[4px] hover:border-[#00FF80] transition-colors cursor-pointer max-w-[152px] h-[192px] flex flex-col"
-              >
-                <div className="relative w-full aspect-square bg-gray-300 rounded-[8px] overflow-hidden mb-[8px] flex-1">
-                  {activeTab === "locked" ? (
-                    <div className="relative w-full h-full">
-                      {reward.imageUrl ? (
-                        <Image
-                          src={reward.imageUrl}
-                          alt={reward.title || "Badge"}
-                          fill
-                          className="object-cover opacity-50"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[#666] to-[#333] flex items-center justify-center opacity-50">
-                          <span className="text-[#FFF] font-bold text-lg">?</span>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-                    </div>
-                  ) : reward.imageUrl ? (
-                    <Image
-                      src={reward.imageUrl}
-                      alt={reward.title || "Badge"}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[#00FF80] to-[#00CC66] flex items-center justify-center">
-                      <span className="text-[#000] font-bold text-lg">?</span>
-                    </div>
-                  )}
-                </div>
-
-                {activeTab === "claimed" && reward.earnedAt && (
-                  <div className="flex items-center gap-[4px] px-[4px]">
-                    <div className="w-[14px] h-[14px] opacity-60">
-                      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="#E0E0E0" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </div>
-                    <p className="text-[#E0E0E0] text-[12px] font-[400] leading-[16px]">
-                      {formatDate(reward.earnedAt)}
-                    </p>
+            {currentRewards.map((reward, index) => {
+              const isClickable = activeTab === "claimed";
+              
+              if (isClickable) {
+                return (
+                  <Link
+                    key={reward.id || index}
+                    href={`/dashboard/nft/${reward.id}`}
+                    className="bg-[#131313] border border-[#2E3033] rounded-[12px] p-[4px] hover:border-[#00FF80] transition-colors cursor-pointer max-w-[152px] h-[192px] flex flex-col"
+                  >
+                    <NFTCardContent reward={reward} activeTab={activeTab} formatDate={formatDate} openClaimModal={openClaimModal} isLoading={isLoading} claimingId={claimingId} />
+                  </Link>
+                );
+              } else {
+                return (
+                  <div
+                    key={reward.id || index}
+                    className="bg-[#131313] border border-[#2E3033] rounded-[12px] p-[4px] hover:border-[#00FF80] transition-colors cursor-pointer max-w-[152px] h-[192px] flex flex-col"
+                  >
+                    <NFTCardContent reward={reward} activeTab={activeTab} formatDate={formatDate} openClaimModal={openClaimModal} isLoading={isLoading} claimingId={claimingId} />
                   </div>
-                )}
-
-                 {activeTab === "unclaimed" && (
-                   <button
-                     onClick={() => openClaimModal(reward)}
-                     disabled={isLoading && claimingId === reward.id}
-                     className="bg-[#00FF80] text-[#000] py-[10px] px-[16px] rounded-[8px] h-[40px] flex items-center justify-center gap-[12px] w-full font-[500] text-[14px] leading-[24px] hover:bg-[#00CC66] transition-colors disabled:opacity-50"
-                   >
-                     {isLoading && claimingId === reward.id ? (
-                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#000]"></div>
-                     ) : (
-                       "Claim"
-                     )}
-                   </button>
-                 )}
-
-                {activeTab === "locked" && reward.title && (
-                  <div className="px-[4px]">
-                    <p className="text-[#E0E0E0] text-[12px] font-[500] leading-[16px] truncate">
-                      {reward.title}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ))}
+                );
+              }
+            })}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-[40px]">
@@ -288,7 +240,6 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
           </div>
         )}
 
-         {/* Ready to Claim Modal */}
          {showClaimModal && selectedReward && (
            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
              <div className="bg-[#131313] rounded-[24px] p-[24px] max-w-[400px] mx-[20px] text-center">
@@ -339,7 +290,6 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
            </div>
          )}
 
-         {/* Success Modal */}
          {showSuccessModal && claimedReward && (
            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
              <div className="bg-[#131313] rounded-[16px] p-[24px] max-w-[400px] mx-[20px] text-center">
@@ -377,7 +327,6 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
            </div>
          )}
 
-         {/* Error Modal */}
          {error && (
            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
              <div className="bg-[#131313] rounded-[16px] p-[24px] max-w-[400px] mx-[20px]">
@@ -398,5 +347,89 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
          )}
       </div>
     </div>
+  );
+}
+
+interface NFTCardContentProps {
+  reward: any;
+  activeTab: "claimed" | "unclaimed" | "locked";
+  formatDate: (dateString: string) => string;
+  openClaimModal: (reward: UserRewardWithDetails) => void;
+  isLoading: boolean;
+  claimingId: string | null;
+}
+
+function NFTCardContent({ reward, activeTab, formatDate, openClaimModal, isLoading, claimingId }: NFTCardContentProps) {
+  return (
+    <>
+      <div className="relative w-full aspect-square bg-gray-300 rounded-[8px] overflow-hidden mb-[8px] flex-1">
+        {activeTab === "locked" ? (
+          <div className="relative w-full h-full">
+            {reward.imageUrl ? (
+              <Image
+                src={reward.imageUrl}
+                alt={reward.title || "Badge"}
+                fill
+                className="object-cover opacity-50"
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#666] to-[#333] flex items-center justify-center opacity-50">
+                <span className="text-[#FFF] font-bold text-lg">?</span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+          </div>
+        ) : reward.imageUrl ? (
+          <Image
+            src={reward.imageUrl}
+            alt={reward.title || "Badge"}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-[#00FF80] to-[#00CC66] flex items-center justify-center">
+            <span className="text-[#000] font-bold text-lg">?</span>
+          </div>
+        )}
+      </div>
+
+      {activeTab === "claimed" && reward.earnedAt && (
+        <div className="flex items-center gap-[4px] px-[4px]">
+          <div className="w-[14px] h-[14px] opacity-60">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="#E0E0E0" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <p className="text-[#E0E0E0] text-[12px] font-[400] leading-[16px]">
+            {formatDate(reward.earnedAt)}
+          </p>
+        </div>
+      )}
+
+      {activeTab === "unclaimed" && (
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            openClaimModal(reward);
+          }}
+          disabled={isLoading && claimingId === reward.id}
+          className="bg-[#00FF80] text-[#000] py-[10px] px-[16px] rounded-[8px] h-[40px] flex items-center justify-center gap-[12px] w-full font-[500] text-[14px] leading-[24px] hover:bg-[#00CC66] transition-colors disabled:opacity-50"
+        >
+          {isLoading && claimingId === reward.id ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#000]"></div>
+          ) : (
+            "Claim"
+          )}
+        </button>
+      )}
+
+      {activeTab === "locked" && reward.title && (
+        <div className="px-[4px]">
+          <p className="text-[#E0E0E0] text-[12px] font-[500] leading-[16px] truncate">
+            {reward.title}
+          </p>
+        </div>
+      )}
+    </>
   );
 }
