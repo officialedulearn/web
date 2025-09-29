@@ -14,6 +14,15 @@ import medal05 from "@/../public/assets/icons/medal05.png";
 import useUserStore from "@/../core/userState";
 import useActivityStore from "@/../core/activityState";
 
+interface Activity {
+  id: string;
+  userId: string;
+  type: 'quiz' | 'chat' | 'streak';
+  title: string;
+  xpEarned: number;
+  createdAt: string;
+}
+
 export interface ActivityHistoryItem {
   id: string;
   sn: number;
@@ -123,7 +132,7 @@ export default function ActivityHistory({
     }
   }, [user?.id, fetchActivities]);
 
-  const transformActivitiesToActivityHistory = (activities: any[]): ActivityHistoryItem[] => {
+  const transformActivitiesToActivityHistory = (activities: Activity[]): ActivityHistoryItem[] => {
     return activities.map((activity, index) => {
       const date = new Date(activity.createdAt).toLocaleDateString('en-US', {
         day: 'numeric',

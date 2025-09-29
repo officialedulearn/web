@@ -4,9 +4,7 @@ import logo from "@/../public/assets/images/logo.png";
 import { FaDiscord } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 
-type Props = {};
-
-const Footer = (props: Props) => {
+const Footer = () => {
   return (
     <div className="relative mt-[120px] overflow-hidden pb-[80px]">
       <div className="absolute bottom-[-40px] left-1/2 -translate-x-1/2 opacity-[0.05] z-0">
@@ -48,7 +46,7 @@ const Footer = (props: Props) => {
               Testimonial
             </p>
             <p className="text-[#B3B3B3] leading-[30px] font-[400] text-[20px] cursor-pointer">
-              FAQ's
+              FAQ&apos;s
             </p>
           </div>
         </div>

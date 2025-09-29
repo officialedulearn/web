@@ -25,9 +25,9 @@ const ChatPage = () => {
         const chatMessages = await chatService.getMessagesInChat(chatId)
         setMessages(chatMessages || [])
         
-        // Load chat history to get the title
+
         const chats = await chatService.getHistory(user.id)
-        const currentChat = chats.find((chat: any) => chat.id === chatId)
+        const currentChat = chats.find((chat) => chat.id === chatId)
         setChatTitle(currentChat?.title || 'New Chat')
       } catch (error) {
         console.error('Error loading chat data:', error)

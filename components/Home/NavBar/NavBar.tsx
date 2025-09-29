@@ -6,9 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import { useRouter } from "next/navigation";
 import useUserStore from "../../../core/userState";
 
-type Props = {};
-
-const NavBar = (props: Props) => {
+const NavBar = () => {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = useUserStore((s) => s.user);

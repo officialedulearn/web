@@ -7,7 +7,6 @@ import medal1 from "@/../public/assets/icons/medal1.png";
 import medal2 from "@/../public/assets/icons/medal2.png";
 import brain from "@/../public/assets/icons/brain.png";
 
-type Props = {};
 
 const features = [
   {
@@ -94,7 +93,7 @@ const FeatureCard = ({
   );
 };
 
-const Features = (props: Props) => {
+const Features = () => {
   return (
     <div className="px-4 sm:px-6 md:px-8 overflow-x-hidden mt-[120px]">
       <div className="mt-10 md:mt-20 lg:mt-30 flex flex-col gap-8 md:gap-12 lg:gap-20">

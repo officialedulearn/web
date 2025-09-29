@@ -66,7 +66,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
       typeof message.content === 'object' &&
       'text' in message.content
     ) {
-      return (message.content as any).text as string
+      return (message.content).text as string
     }
     return ''
   }

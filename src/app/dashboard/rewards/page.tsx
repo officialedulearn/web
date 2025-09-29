@@ -5,6 +5,26 @@ import Link from "next/link";
 import useUserStore from "@/../core/userState";
 import { RewardsService } from "@/../services/rewards.service";
 import { WalletService } from "@/../services/wallet.service";
+
+interface Reward {
+  id: string;
+  type: 'certificate' | 'points';
+  title: string;
+  description: string;
+  imageUrl?: string;
+  createdAt?: string;
+  ipfs?: string;
+}
+
+interface UserRewardWithDetails {
+  id: string;
+  type: "certificate" | "points";
+  title: string;
+  description: string;
+  imageUrl?: string;
+  earnedAt: string;
+  signature?: string;
+}
 import level from "@/../public/assets/icons/levelHolder1.png";
 import medal06 from "@/../public/assets/icons/medal06.png";
 import { Progress } from "@/components/ui/progress";
@@ -34,7 +54,7 @@ const milestones = {
 export default function RewardsPage() {
   const user = useUserStore((state) => state.user);
   const fetchWalletBalance = useUserStore((state) => state.fetchWalletBalance);
-  const [rewards, setRewards] = useState<any[]>([]);
+  const [rewards, setRewards] = useState<UserRewardWithDetails[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userEarnings, setUserEarnings] = useState<{ sol: number; edln: number; hasEarnings: boolean }>({
     sol: 0,
@@ -122,8 +142,8 @@ export default function RewardsPage() {
       } else {
         alert("Failed to claim: " + result.message);
       }
-    } catch (error: any) {
-      alert("Error: " + (error.message || "Failed to claim EDLN tokens"));
+    } catch (error: unknown) {
+      alert("Error: " + (error instanceof Error ? error.message : "Failed to claim EDLN tokens"));
     } finally {
       setClaimingEDLN(false);
     }
@@ -149,8 +169,8 @@ export default function RewardsPage() {
       } else {
         alert("Failed to claim: " + result.message);
       }
-    } catch (error: any) {
-      alert("Error: " + (error.message || "Failed to claim USDC"));
+    } catch (error: unknown) {
+      alert("Error: " + (error instanceof Error ? error.message : "Failed to claim USDC"));
     } finally {
       setClaimingSOL(false);
     }
@@ -325,7 +345,7 @@ export default function RewardsPage() {
         ) : (
           <div className="flex flex-col items-center justify-center py-[40px] px-[20px] bg-[#0F0F0F] rounded-[12px] w-full">
             <p className="text-[#E0E0E0] text-[16px] font-[500] mb-[8px] text-center">
-              You haven't earned any badges yet.
+              You haven&apos;t earned any badges yet.
             </p>
             <p className="text-[#B3B3B3] text-[14px] font-[400] text-center">
               Complete quizzes and lessons to collect them!

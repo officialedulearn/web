@@ -52,7 +52,7 @@ const generateUUID = () => {
 };
 
 const Chat = ({ title, initialMessages = [], chatId }: Props) => {
-  const { user, theme } = useUserStore();
+  const { user } = useUserStore();
   const router = useRouter();
   const aiService = new AIService();
   const chatService = new ChatService();
@@ -66,7 +66,6 @@ const Chat = ({ title, initialMessages = [], chatId }: Props) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -243,16 +242,6 @@ const Chat = ({ title, initialMessages = [], chatId }: Props) => {
     }
   }, [user?.id, fetchSuggestions, messages.length]);
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   if (isTransitioning) {
     return (

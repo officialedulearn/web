@@ -14,6 +14,15 @@ import medal05 from "@/../public/assets/icons/medal05.png";
 import useUserStore from "@/../core/userState";
 import useActivityStore from "@/../core/activityState";
 
+interface Activity {
+  id: string;
+  userId: string;
+  type: 'quiz' | 'chat' | 'streak';
+  title: string;
+  xpEarned: number;
+  createdAt: string;
+}
+
 export interface QuizHistoryItem {
   id: string;
   sn: number;
@@ -105,7 +114,7 @@ export default function QuizHistory({
     }
   }, [user?.id, fetchActivities]);
 
-  const transformActivitiesToQuizHistory = (activities: any[]): QuizHistoryItem[] => {
+  const transformActivitiesToQuizHistory = (activities: Activity[]): QuizHistoryItem[] => {
     return activities
       .filter(activity => activity.type === 'quiz')
       .map((activity, index) => {

@@ -9,7 +9,6 @@ import { createClient } from "../../utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
-type Props = {};
 
 interface FormData {
   name: string;
@@ -18,7 +17,7 @@ interface FormData {
   username: string;
 }
 
-const Signup = (props: Props) => {
+const Signup = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({

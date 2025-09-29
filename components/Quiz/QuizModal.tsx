@@ -34,7 +34,7 @@ interface QuizModalProps {
 const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(60); // 1 minute in seconds
+  const [timeLeft, setTimeLeft] = useState(60);
   const [userAnswers, setUserAnswers] = useState<UserAnswer[]>([]);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [chatTitle, setChatTitle] = useState("");
@@ -51,7 +51,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
   const aiService = new AIService();
   const chatService = new ChatService();
 
-  // Timer effect
   useEffect(() => {
     if (!isOpen || quizCompleted) return;
     
@@ -69,7 +68,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
     return () => clearInterval(timer);
   }, [isOpen, quizCompleted]);
 
-  // Fetch questions when modal opens
   useEffect(() => {
     if (!isOpen || !user?.id) return;
 
@@ -78,7 +76,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
         setLoading(true);
         setError(null);
 
-        // Fetch chat title
         try {
           const chat = await chatService.getChatById(chatId);
           if (chat && chat.title) {
@@ -91,7 +88,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
           setChatTitle("Quiz");
         }
 
-        // Generate quiz questions
         const response = await aiService.generateQuiz({
           chatId,
           userId: user.id,
@@ -105,7 +101,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
         }
 
         setLoading(false);
-      } catch (error: any) {
+      } catch (error) {
         console.error("Error fetching quiz questions:", error);
         setLoading(false);
         setError("Something went wrong while generating your quiz. Please try again later.");
@@ -115,7 +111,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
     fetchQuestions();
   }, [isOpen, chatId, user?.id]);
 
-  // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setQuestions([]);
@@ -210,17 +205,14 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Blurred Background */}
       <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
       
-      {/* Modal Content */}
       <div className={`relative w-full max-w-xl mx-4 max-h-[85vh] flex flex-col rounded-2xl ${
         theme === "dark" ? "bg-[#0D0D0D]" : "bg-white"
       }`}>
-        {/* Header */}
         <div className={`flex items-center justify-between p-4 border-b ${
           theme === "dark" ? "border-[#2E3033]" : "border-[#E0E7F0]"
         }`}>
@@ -249,7 +241,6 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
           )}
         </div>
 
-        {/* Progress Bar */}
         {!quizCompleted && questions.length > 0 && (
           <div className="px-4 py-3">
             <div className="flex items-center justify-between mb-2">
@@ -371,7 +362,7 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
                     <p className={`text-sm mb-6 ${
                       theme === "dark" ? "text-[#E0E0E0]" : "text-[#2D3C52]"
                     }`}>
-                      Don't worry, learning is a journey.
+                      Don&apos;t worry, learning is a journey.
                     </p>
                   )}
 
@@ -390,8 +381,8 @@ const QuizModal: React.FC<QuizModalProps> = ({ isOpen, onClose, chatId }) => {
                     theme === "dark" ? "text-[#B3B3B3]" : "text-[#61728C]"
                   }`}>
                     {score >= 3
-                      ? "You're one step closer to your next badge. Keep the momentum going! Want to sharpen your skills even more? Try a follow-up quiz or review your answers."
-                      : `You got ${score} out of 5, which means there's room to grow. You still earned ${score} XP just for trying, and now you know where to improve. Review your answers and give it another go. You've got this!`}
+                      ? "You&apos;re one step closer to your next badge. Keep the momentum going! Want to sharpen your skills even more? Try a follow-up quiz or review your answers."
+                      : `You got ${score} out of 5, which means there&apos;s room to grow. You still earned ${score} XP just for trying, and now you know where to improve. Review your answers and give it another go. You&apos;ve got this!`}
                   </p>
 
                   <div className="flex items-center justify-center gap-2 mb-6">

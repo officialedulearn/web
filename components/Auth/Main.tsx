@@ -1,10 +1,7 @@
 import React from 'react'
 import Signup from './Signup'
 import Sidebar from './sidebar'
-
-type Props = {}
-
-const Main = (props: Props) => {
+const Main = () => {
   return (
     <div className='w-full min-h-screen flex flex-col md:flex-row items-center justify-center gap-[40px] md:gap-[100px] px-6 py-8 md:p-[50px] md:py-[80px]'>
         <div className='w-full md:w-1/2 flex justify-center'>

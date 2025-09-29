@@ -5,6 +5,16 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import useUserStore from "@/../core/userState";
 import { RewardsService } from "@/../services/rewards.service";
+
+interface Reward {
+  id: string;
+  type: 'certificate' | 'points';
+  title: string;
+  description: string;
+  imageUrl?: string;
+  createdAt?: string;
+  ipfs?: string;
+}
 import { format } from "date-fns";
 
 interface UserRewardWithDetails {
@@ -20,7 +30,7 @@ interface UserRewardWithDetails {
 export default function NFTDetailsPage() {
   const params = useParams();
   const id = params.id as string;
-  const [reward, setReward] = useState<any>(null);
+  const [reward, setReward] = useState<Reward | null>(null);
   const [userReward, setUserReward] = useState<UserRewardWithDetails | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,9 +81,6 @@ export default function NFTDetailsPage() {
     if (userReward?.signature) {
       const explorerUrl = `https://solscan.io/tx/${userReward.signature}`;
       window.open(explorerUrl, '_blank');
-    } else if (reward?.signature) {
-      const explorerUrl = `https://solscan.io/tx/${reward.signature}`;
-      window.open(explorerUrl, '_blank');
     }
   };
 
@@ -109,7 +116,7 @@ export default function NFTDetailsPage() {
             </svg>
           </div>
           <p className="text-[#E0E0E0] text-[18px] font-[500] mb-2 text-center">NFT Not Found</p>
-          <p className="text-[#B3B3B3] text-[14px] font-[400] text-center">The NFT you're looking for doesn't exist or has been removed.</p>
+          <p className="text-[#B3B3B3] text-[14px] font-[400] text-center">The NFT you&apos;re looking for doesn&apos;t exist or has been removed.</p>
           <Link href="/dashboard/nfts">
             <button className="mt-6 bg-[#00FF80] text-[#000] px-[24px] py-[12px] rounded-[12px] font-[500] text-[14px] hover:bg-[#00CC66] transition-colors">
               Back to NFTs
@@ -185,7 +192,7 @@ export default function NFTDetailsPage() {
           </div>
 
           <div className="space-y-[12px]">
-            {(userReward?.signature || reward?.signature) && (
+            {userReward?.signature && (
               <button
                 onClick={handleViewOnExplorer}
                 className="w-full bg-[#00FF80] text-[#000] py-[12px] px-[24px] rounded-[12px] font-[500] text-[16px] hover:bg-[#00CC66] transition-colors flex items-center justify-center gap-[8px]"

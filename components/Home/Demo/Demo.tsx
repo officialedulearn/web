@@ -3,9 +3,8 @@ import React, { useState } from "react";
 import Image from "next/image";
 import logo from "@/../public/assets/images/edulearn.png";
 import playIcon from "@/../public/assets/icons/play.png";
-type Props = {};
 
-const Demo = (props: Props) => {
+const Demo = () => {
   const [playing, setPlaying] = useState(false);
 
   return (

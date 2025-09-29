@@ -7,11 +7,10 @@ import annie from "@/../public/assets/annie.jpg";
 
 
 
-type Props = {};
 
 interface TestimonialCardProps {
   name: string;
-  username: string;
+  username: string; 
   content: string;
   tweetUrl: string;
   avatar: StaticImageData;
@@ -57,7 +56,7 @@ const TestimonialCard = ({ name, username, content, tweetUrl, avatar }: Testimon
   );
 };
 
-const Testemonial = (props: Props) => {
+const Testemonial = () => {
   const testimonials = [
     {
       name: "itsdave.solana",

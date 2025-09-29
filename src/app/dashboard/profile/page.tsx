@@ -115,8 +115,8 @@ export default function ProfilePage() {
       toggleBuyModal();
       
       setBuySuccessModalVisible(true);
-    } catch (error: any) {
-      setBuyError(error.message || "Failed to complete purchase");
+    } catch (error: unknown) {
+      setBuyError(error instanceof Error ? error.message : "Failed to complete purchase");
       setIsBuying(false);
     }
   };
@@ -129,7 +129,7 @@ export default function ProfilePage() {
       await fetchWalletBalance();
       setIsBurning(false);
       setBurnSuccessModalVisible(true);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error burning tokens:", error);
       setIsBurning(false);
     }
@@ -728,7 +728,6 @@ export default function ProfilePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Export Wallet Confirmation Modal */}
       <Dialog open={confirmExportModalVisible} onOpenChange={setConfirmExportModalVisible}>
         <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md flex items-center flex-col">
           <DialogHeader className="text-center">
@@ -768,8 +767,6 @@ export default function ProfilePage() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Export Wallet Private Key Modal */}
       <Dialog open={exportWalletModalVisible} onOpenChange={setExportWalletModalVisible}>
         <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md flex items-center flex-col">
           <DialogHeader className="text-center">
@@ -813,8 +810,6 @@ export default function ProfilePage() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Burn Success Modal */}
       <Dialog open={burnSuccessModalVisible} onOpenChange={setBurnSuccessModalVisible}>
         <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md flex items-center flex-col">
           <DialogHeader className="text-center">
@@ -829,7 +824,7 @@ export default function ProfilePage() {
               Tokens Burned Successfully!
             </DialogTitle>
             <DialogDescription className="text-[#61728C] dark:text-[#B3B3B3] text-[16px] font-[400] leading-[24px] text-center mb-6">
-              You've received 3 credits and your wallet balance has been updated.
+              You&apos;ve received 3 credits and your wallet balance has been updated.
             </DialogDescription>
           </DialogHeader>
           

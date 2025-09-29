@@ -9,9 +9,8 @@ import quiz from "@/../public/assets/icons/brain02.png";
 import levelHolder from "@/../public/assets/icons/levelHolder.png";
 import thirdMedal from "@/../public/assets/icons/thirdPlace.png";
 import fire from "@/../public/assets/icons/fire.png";
-type Props = {};
 
-const Cards = (props: Props) => {
+const Cards = () => {
    const user = useUserStore((state) => state.user);
    const { activities, quizActivities, fetchActivities, fetchQuizActivities } =
      useActivityStore();
@@ -69,7 +68,7 @@ const Cards = (props: Props) => {
           
           <div className="flex flex-col items-center text-center">
             <div className="text-2xl font-bold text-white mb-1">+{weeklyActivityXP} XP</div>
-            <div className="text-[#B3B3B3] text-xs">This week's progress</div>
+            <div className="text-[#B3B3B3] text-xs">This week&apos;s progress</div>
           </div>
         </div>
 

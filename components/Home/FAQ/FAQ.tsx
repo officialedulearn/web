@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import add from "@/../public/assets/icons/addcircle.svg";
 import remove from "@/../public/assets/icons/circle.svg";
-type Props = {};
 
 const FAQData = [
   {
@@ -29,11 +28,11 @@ const FAQData = [
   {
     question: "How is my progress tracked?",
     answer:
-      "Your progress is tracked through the XP system, which measures your learning journey. You can view your XP, completed quizzes, and earned NFTs in your profile. This allows you to see how far you've come and what rewards you've unlocked.",
+      "Your progress is tracked through the XP system, which measures your learning journey. You can view your XP, completed quizzes, and earned NFTs in your profile. This allows you to see how far you&apos;ve come and what rewards you&apos;ve unlocked.",
   },
 ];
 
-const FAQ = (props: Props) => {
+const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
@@ -48,7 +47,7 @@ const FAQ = (props: Props) => {
         </div>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 md:gap-8">
           <h2 className="text-[#E0E0E0] leading-[32px] sm:leading-[40px] md:leading-[56px] font-[600] text-2xl md:text-3xl lg:text-[40px]">
-            Got Questions? We've Got Answers.
+            Got Questions? We&apos;ve Got Answers.
           </h2>
 
           <p className="text-[#B3B3B3] leading-[24px] md:leading-[28px] text-base md:text-lg lg:text-[20px] opacity-[0.7] font-normal md:max-w-[500px]">

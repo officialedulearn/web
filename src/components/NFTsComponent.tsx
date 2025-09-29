@@ -6,6 +6,16 @@ import useUserStore from '@/../core/userState'
 import { RewardsService } from '@/../services/rewards.service'
 import { format } from 'date-fns'
 
+interface Reward {
+  id: string;
+  type: 'certificate' | 'points';
+  title: string;
+  description: string;
+  imageUrl?: string;
+  createdAt?: string;
+  ipfs?: string;
+}
+
 interface UserRewardWithDetails {
   id: string;
   type: "certificate" | "points";
@@ -22,10 +32,10 @@ interface NFTsComponentProps {
 
 export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
   const [activeTab, setActiveTab] = useState<"claimed" | "unclaimed" | "locked">("claimed");
-  const [allRewards, setAllRewards] = useState<any[]>([]);
+  const [allRewards, setAllRewards] = useState<Reward[]>([]);
   const [claimedRewards, setClaimedRewards] = useState<UserRewardWithDetails[]>([]);
   const [unclaimedRewards, setUnclaimedRewards] = useState<UserRewardWithDetails[]>([]);
-  const [lockedRewards, setLockedRewards] = useState<any[]>([]);
+  const [lockedRewards, setLockedRewards] = useState<Reward[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -101,14 +111,14 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
       if (unclaimed.length === 0) {
         setActiveTab("claimed");
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Failed to claim reward:", error);
       
       let errorMessage = "Failed to claim badge";
       
-      if (error?.message) {
+      if (error instanceof Error) {
         if (error.message.includes("insufficient funds for rent")) {
-          errorMessage = "Your wallet doesn't have enough SOL to pay for transaction fees";
+          errorMessage = "Your wallet doesn&apos;t have enough SOL to pay for transaction fees";
         } else if (error.message.includes("Transaction simulation failed")) {
           errorMessage = "Transaction failed. Please try again later";
         } else {
@@ -259,7 +269,7 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
                </h3>
                
                <p className="text-[#FFFFFF] text-[16px] text-center mb-[16px]">
-                 You're about to claim{" "}
+                 You&apos;re about to claim{" "}
                  <span className="text-[#E0E0E0] font-[700]">
                    {selectedReward.title}
                  </span>
@@ -351,7 +361,7 @@ export default function NFTsComponent({ className = "" }: NFTsComponentProps) {
 }
 
 interface NFTCardContentProps {
-  reward: any;
+  reward: Reward | UserRewardWithDetails;
   activeTab: "claimed" | "unclaimed" | "locked";
   formatDate: (dateString: string) => string;
   openClaimModal: (reward: UserRewardWithDetails) => void;
@@ -393,7 +403,7 @@ function NFTCardContent({ reward, activeTab, formatDate, openClaimModal, isLoadi
         )}
       </div>
 
-      {activeTab === "claimed" && reward.earnedAt && (
+      {activeTab === "claimed" && 'earnedAt' in reward && reward.earnedAt && (
         <div className="flex items-center gap-[4px] px-[4px]">
           <div className="w-[14px] h-[14px] opacity-60">
             <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -401,7 +411,7 @@ function NFTCardContent({ reward, activeTab, formatDate, openClaimModal, isLoadi
             </svg>
           </div>
           <p className="text-[#E0E0E0] text-[12px] font-[400] leading-[16px]">
-            {formatDate(reward.earnedAt)}
+            {formatDate('earnedAt' in reward ? reward.earnedAt : '')}
           </p>
         </div>
       )}
@@ -410,7 +420,9 @@ function NFTCardContent({ reward, activeTab, formatDate, openClaimModal, isLoadi
         <button
           onClick={(e) => {
             e.preventDefault();
-            openClaimModal(reward);
+            if ('earnedAt' in reward) {
+              openClaimModal(reward);
+            }
           }}
           disabled={isLoading && claimingId === reward.id}
           className="bg-[#00FF80] text-[#000] py-[10px] px-[16px] rounded-[8px] h-[40px] flex items-center justify-center gap-[12px] w-full font-[500] text-[14px] leading-[24px] hover:bg-[#00CC66] transition-colors disabled:opacity-50"

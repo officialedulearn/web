@@ -1,9 +1,7 @@
 import React from "react";
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 
-type Props = {};
-
-const CTA = (props: Props) => {
+const CTA = () => {
   return (
     <div className="flex items-center justify-center mt-[120px] mb-[80px]">
       <div className="flex flex-col items-center">

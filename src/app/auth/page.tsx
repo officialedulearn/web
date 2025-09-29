@@ -1,9 +1,7 @@
 import Main from '@/../components/Auth/Main'
 import React from 'react'
 
-type Props = {}
-
-const page = (props: Props) => {
+const page = () => {
   return (
     <Main />
   )

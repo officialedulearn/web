@@ -5,9 +5,7 @@ import QuizImage from "@/../public/quizzes.png";
 import XPIMage from "@/../public/xp.png";
 import LeaderBoard from "@/../public/leaderboard.png";
 
-type Props = {};
-
-const HowItWorks = (props: Props) => {
+const HowItWorks = () => {
   return (
     <div className="px-4 sm:px-6 md:px-8 overflow-x-hidden">
       <div className="mt-10 md:mt-20 lg:mt-30 flex flex-col gap-8 md:gap-12 lg:gap-20">
@@ -20,7 +18,7 @@ const HowItWorks = (props: Props) => {
           </h2>
 
           <p className="text-[#B3B3B3] leading-[24px] md:leading-[28px] text-base md:text-lg lg:text-[20px] opacity-[0.7] font-normal md:max-w-[500px]">
-            From AI tutoring to gamified rewards — here's how to level up your
+            From AI tutoring to gamified rewards — here&apos;s how to level up your
             learning journey.
           </p>
         </div>

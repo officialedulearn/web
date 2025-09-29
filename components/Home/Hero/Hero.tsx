@@ -5,9 +5,7 @@ import Image from "next/image";
 import HeroImage from "@/../public/image.webp";
 import HeroImageMobile from "@/../public/image-mobile.png";
 
-type Props = {};
-
-const Hero = (props: Props) => {
+const Hero = () => {
   const [copied, setCopied] = useState(false);
   const contractAddress = "CFw2KxMpWuxivoowkF8vRCrnMuDeg5VMHRR7zjE7pBLV";
 

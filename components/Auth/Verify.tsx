@@ -15,9 +15,7 @@ import { UserService } from '../../services/user.service';
 import { Loader2 } from "lucide-react";
 import { CustomAlert } from "../CustomAlert";
 
-type Props = {};
-
-const Verify = (props: Props) => {
+const Verify = () => {
   const [otp, setOtp] = useState("");
   const [timeLeft, setTimeLeft] = useState(30 * 60);
   const [loading, setLoading] = useState(false);
@@ -31,7 +29,7 @@ const Verify = (props: Props) => {
     description?: string;
   }>({ show: false, variant: "info", title: "" });
   
-  const {setUserAsync, setUser} = useUserStore()
+  const {setUser} = useUserStore()
   
   const showAlert = (variant: "success" | "destructive" | "warning" | "info", title: string, description?: string) => {
     setAlert({ show: true, variant, title, description });

@@ -73,7 +73,7 @@ export default function QuizzesPage() {
             <p className={`text-sm sm:text-base mt-1 ${
               theme === "dark" ? "text-[#B3B3B3]" : "text-[#2D3C52]"
             }`}>
-              Practice what you've learned. Earn XP. Get smarter.
+              Practice what you&apos;ve learned. Earn XP. Get smarter.
             </p>
           </div>
           <div className={`flex items-center rounded-lg border gap-2 py-2 px-3 ${
