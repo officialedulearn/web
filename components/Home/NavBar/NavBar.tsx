@@ -57,7 +57,7 @@ const NavBar = () => {
       </div>
 
       {!user ? (
-        <div className="hidden md:flex items-center gap-[8px] lg:gap-[12px]">
+        <div className="hidden md:flex items-center gap-[8px] lg:gap-[12px]" onClick={() => router.push("/auth")}>
           <span className="border border-[#00FF80] h-[40px] lg:h-[48px] rounded-[8px] px-[16px] lg:px-[32px] py-[8px] lg:py-[10px] text-[#00FF80] font-bold text-[14px] lg:text-[16px] leading-normal cursor-pointer whitespace-nowrap">
             Sign In
           </span>

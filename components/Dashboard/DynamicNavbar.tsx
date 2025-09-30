@@ -107,9 +107,7 @@ export function DynamicNavbar() {
               {user?.xp}
             </p>
           </div>
-          <div onClick={() => {
-            setTheme(theme === "dark" ? "light" : "dark");
-          }}>
+          <div>
             <Image src={moon} alt="Badge" width={28} height={28} />
           </div>
         </div>
