@@ -253,7 +253,7 @@ const Verify = () => {
 
           <div className="text-center space-y-2">
               <p className="text-[#61728C] dark:text-[#E0E0E0] text-[14px] leading-[24px] font-[400]">
-              Didn't receive a code?{" "}
+              Didn&apos;t receive a code?{" "}
               <span
                 className={`text-[#2D3C52] dark:text-[#E0E0E0] font-[700] cursor-pointer hover:opacity-80 transition-opacity ${
                   (!canResend || resendLoading) && "opacity-50 cursor-not-allowed"
