@@ -6,7 +6,6 @@ import leftArrowDark from "@/../public/assets/icons/dark/leftArrow.png";
 import leftArrowLight from "@/../public/assets/icons/leftArrow.png";
 import useUserStore from '../../core/userState';
 import { UserService } from '../../services/user.service';
-import { RoadmapService } from '../../services/roadmap.service';
 import { Loader2 } from "lucide-react";
 import { CustomAlert } from "../CustomAlert";
 
@@ -140,7 +139,7 @@ const LearningGoal = () => {
             <ul className="space-y-2 text-[#61728C] dark:text-[#B3B3B3] text-[14px]">
               <li className="flex items-start gap-2">
                 <span className="text-[#00FF80] mt-1">✓</span>
-                <span>We'll generate a personalized learning roadmap</span>
+                <span>We&apos;ll generate a personalized learning roadmap</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-[#00FF80] mt-1">✓</span>
