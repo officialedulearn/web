@@ -34,7 +34,7 @@ const jobs: Job[] = [
     nft: "https://lmektyexzejjvisjpzxu.supabase.co/storage/v1/object/public/nfts/photo_2025-11-09_03-01-24.jpg",
     pay: "50",
     rewardId: "7838fd39-2003-4759-b567-40f04ce3b835",
-    applicationLink: "https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform"
+    applicationLink: "https://docs.google.com/forms/d/e/1FAIpQLSfXsXZOv7JF-05xuesK-Ntp834EHj97Z5yD3A4L-g_OmSsdHw/viewform?usp=header"
   },
  
 ]
