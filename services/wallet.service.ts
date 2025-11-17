@@ -1,5 +1,5 @@
 import httpClient from "../utils/httpClient";
-
+import axios from "axios"
 const LAMPORTS_PER_SOL = 1000000000
 
 interface BalanceResponse {
@@ -39,15 +39,34 @@ interface DecryptPrivateKeyResponse {
   error?: string;
   privateKey?: string;
 }
+interface PriceResponse {
+  SOL: number;
+  EDLN: number;
+}
 
 export class WalletService {
   async getBalance(publicKey: string): Promise<BalanceResponse> {
     try {
       const response = await httpClient.get(`/wallet/balance/${publicKey}`);
       return response.data.balance;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching balance:', error);
-      throw error;
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to fetch balance';
+      throw new Error(errorMessage);
+    }
+  }
+
+  async getPrices(): Promise<PriceResponse> {
+    const SOL_ADDRESS = "So11111111111111111111111111111111111111112";
+    const EDLN_ADDRESS = "CFw2KxMpWuxivoowkF8vRCrnMuDeg5VMHRR7zjE7pBLV";
+    
+    const response = await axios.get(
+      `https://lite-api.jup.ag/price/v3?ids=${SOL_ADDRESS},${EDLN_ADDRESS}`
+    );
+
+    return {
+      SOL: response.data[SOL_ADDRESS]?.usdPrice || 0,
+      EDLN: response.data[EDLN_ADDRESS]?.usdPrice || 0
     }
   }
 
@@ -57,9 +76,10 @@ export class WalletService {
         amount: planAmount
       });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error upgrading to premium:', error);
-      throw error;
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to upgrade to premium';
+      throw new Error(errorMessage);
     }
   }
 
@@ -67,9 +87,10 @@ export class WalletService {
     try {
       const response = await httpClient.get(`/wallet/earnings/${userId}`);
       return response.data.earnings;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching user earnings:', error);
-      throw error;
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to fetch earnings';
+      throw new Error(errorMessage);
     }
   }
 
@@ -77,9 +98,10 @@ export class WalletService {
     try {
       const response = await httpClient.post('/wallet/swap', { userId, amount });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error swapping SOL to EDLN:', error);
-      throw error;
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to complete swap transaction';
+      throw new Error(errorMessage);
     }
   }
 
@@ -87,9 +109,10 @@ export class WalletService {
     try {
       const response = await httpClient.post('/wallet/burn', { userId, amount });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error burning EDLN tokens:', error);
-      throw error;
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to burn EDLN tokens';
+      throw new Error(errorMessage);
     }
   }
 
@@ -97,9 +120,10 @@ export class WalletService {
     try {
       const response = await httpClient.post('/wallet/earnings/claim', { userId, type });
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error claiming earnings:', error);
-      throw error;
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to claim earnings';
+      throw new Error(errorMessage);
     }
   }
 
