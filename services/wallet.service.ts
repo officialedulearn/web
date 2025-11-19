@@ -39,6 +39,34 @@ interface DecryptPrivateKeyResponse {
   error?: string;
   privateKey?: string;
 }
+
+export interface DeviceInfo {
+  uuid: string;
+  device: string;
+  os: string;
+  browser: string;
+  ip: string;
+}
+
+interface InitiateOnrampResponse {
+  message: string;
+  result: {
+    initiated: any;
+    email: string;
+    address: string;
+  };
+}
+
+interface VerifyOnrampResponse {
+  message: string;
+  verifiedResponse: any;
+}
+
+interface OnrampOrderResponse {
+  message: string;
+  order: any;
+}
+
 interface PriceResponse {
   SOL: number;
   EDLN: number;
@@ -141,6 +169,46 @@ export class WalletService {
         success: false,
         error: 'Failed to decrypt private key'
       };
+    }
+  }
+
+  async initiateOnramp(userId: string): Promise<InitiateOnrampResponse> {
+    try {
+      const response = await httpClient.post(`/wallet/onramp/initiate/${userId}`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error initiating onramp:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to initiate onramp';
+      throw new Error(errorMessage);
+    }
+  }
+
+  async verifyOnramp(email: string, otp: string, deviceInfo: DeviceInfo): Promise<VerifyOnrampResponse> {
+    try {
+      const response = await httpClient.post('/wallet/onramp/verify', {
+        email,
+        otp,
+        deviceInfo
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error verifying onramp:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to verify onramp';
+      throw new Error(errorMessage);
+    }
+  }
+
+  async onrampFiatToEdln(userId: string, amount: number, verifiedResponse: any): Promise<OnrampOrderResponse> {
+    try {
+      const response = await httpClient.post(`/wallet/onramp/create-order/${userId}`, {
+        amount,
+        verifiedResponse
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error creating onramp order:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to create onramp order';
+      throw new Error(errorMessage);
     }
   }
 

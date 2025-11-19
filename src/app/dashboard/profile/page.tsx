@@ -501,6 +501,13 @@ export default function ProfilePage() {
                 <p className="text-[#61728C] text-[12px] font-[500] leading-[16px]">EDLN</p>
               </div>
             </div>
+            
+            <button
+              onClick={() => router.push('/dashboard/wallet')}
+              className="text-[#000] text-[12px] font-[500] underline decoration-black underline-offset-2 hover:opacity-80 transition-opacity text-center cursor-pointer"
+            >
+              manage cash
+            </button>
           </div>
         </div>
       </div>  

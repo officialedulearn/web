@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState, useMemo } from 'react'
-import { WalletService } from '../../../../services/wallet.service'
+import { WalletService, DeviceInfo } from '../../../../services/wallet.service'
 import useUserStore from '../../../../core/userState'
 import { getHighQualityImageUrl } from '../../../../utils/imageHelper'
 import Image from 'next/image'
@@ -33,8 +33,35 @@ function Wallet() {
     const [transactionLink, setTransactionLink] = useState<string>("")
     const [isBuying, setIsBuying] = useState(false)
     const [isRefreshing, setIsRefreshing] = useState(false)
+    
+    const [buyMethod, setBuyMethod] = useState<'sol' | 'cash' | null>(null)
+    const [onrampStep, setOnrampStep] = useState<'method' | 'otp' | 'payment'>('method')
+    const [otp, setOtp] = useState("")
+    const [cashAmount, setCashAmount] = useState("")
+    const [onrampError, setOnrampError] = useState<string | null>(null)
+    const [isProcessingOnramp, setIsProcessingOnramp] = useState(false)
+    const [verifiedToken, setVerifiedToken] = useState<any>(null)
+    const [paymentDetails, setPaymentDetails] = useState<{
+        id: string
+        accountNumber: string
+        accountName: string
+        fiatAmount: number
+        bank: string
+    } | null>(null)
 
     const { user } = useUserStore()
+    
+    useEffect(() => {
+        const storedToken = localStorage.getItem('onramp_verified_token')
+        if (storedToken) {
+            try {
+                setVerifiedToken(JSON.parse(storedToken))
+            } catch (e) {
+                console.error('Failed to parse stored token:', e)
+                localStorage.removeItem('onramp_verified_token')
+            }
+        }
+    }, [])
 
     const netWorth = useMemo(() => {
         return (edlnBalance * prices.EDLN) + (solBalance * prices.SOL)
@@ -51,7 +78,6 @@ function Wallet() {
     useEffect(() => {
         const fillUpBalances = async () => {
             if (!user?.address) {
-                setError('User address not found')
                 setLoading(false)
                 return
             }
@@ -66,7 +92,7 @@ function Wallet() {
                 ])
 
                 setSolBalance(balance.sol)
-                setEdlnBalance(balance.tokenAccount)
+                setEdlnBalance(balance.tokenAccount || 0)
                 setPrices(priceData)
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to fetch wallet data')
@@ -77,7 +103,7 @@ function Wallet() {
         }
 
         fillUpBalances()
-    }, [user?.address])
+    }, [user])
 
     const copyToClipboard = async (text: string) => {
         try {
@@ -94,6 +120,96 @@ function Wallet() {
         if (!isBuyModalVisible) {
             setBuyAmount("")
             setBuyError(null)
+            setBuyMethod(null)
+            setOnrampStep('method')
+            setOtp("")
+            setCashAmount("")
+            setOnrampError(null)
+            setPaymentDetails(null)
+        }
+    }
+
+    const getDeviceInfo = (): DeviceInfo => {
+        return {
+            uuid: crypto.randomUUID(),
+            device: navigator.userAgent,
+            os: navigator.platform,
+            browser: navigator.userAgent.split(' ').pop() || 'Unknown',
+            ip: '0.0.0.0'
+        }
+    }
+
+    const handleInitiateOnramp = async () => {
+        try {
+            setIsProcessingOnramp(true)
+            setOnrampError(null)
+            
+            if (verifiedToken) {
+                setOnrampStep('otp')
+                setIsProcessingOnramp(false)
+                return
+            }
+            
+            const result = await walletService.initiateOnramp(user?.id || "")
+            setOnrampStep('otp')
+        } catch (error) {
+            setOnrampError(error instanceof Error ? error.message : "Failed to initiate purchase")
+        } finally {
+            setIsProcessingOnramp(false)
+        }
+    }
+
+    const handleVerifyOtp = async () => {
+        try {
+            setIsProcessingOnramp(true)
+            setOnrampError(null)
+
+            const amount = parseFloat(cashAmount)
+            if (isNaN(amount) || amount <= 0) {
+                setOnrampError("Please enter a valid amount")
+                setIsProcessingOnramp(false)
+                return
+            }
+
+            let tokenToUse = verifiedToken
+
+            if (!verifiedToken) {
+                if (!otp || otp.length < 4) {
+                    setOnrampError("Please enter a valid OTP")
+                    setIsProcessingOnramp(false)
+                    return
+                }
+
+                const deviceInfo = getDeviceInfo()
+                const verifiedResponse = await walletService.verifyOnramp(user?.email || "", otp, deviceInfo)
+                
+                tokenToUse = verifiedResponse.verifiedResponse
+                setVerifiedToken(tokenToUse)
+                localStorage.setItem('onramp_verified_token', JSON.stringify(tokenToUse))
+            }
+            
+            const order = await walletService.onrampFiatToEdln(
+                user?.id || "",
+                amount,
+                tokenToUse
+            )
+
+            if (order?.order) {
+                setPaymentDetails({
+                    id: order.order.id || '',
+                    accountNumber: order.order.accountNumber || '',
+                    accountName: order.order.accountName || '',
+                    fiatAmount: order.order.fiatAmount || 0,
+                    bank: order.order.bank || ''
+                })
+                setOnrampStep('payment')
+            } else {
+                throw new Error('Invalid order response')
+            }
+        } catch (error) {
+            setOnrampError(error instanceof Error ? error.message : "Failed to verify OTP")
+        } finally {
+            setIsProcessingOnramp(false)
         }
     }
 
@@ -499,59 +615,233 @@ function Wallet() {
                 <DialogContent className="bg-[#FFFFFF] dark:bg-[#131313] border-[#EDF3FC] dark:border-[#2E3033] max-w-md">
                     <DialogHeader>
                         <DialogTitle className="text-[#2D3C52] dark:text-[#E0E0E0] text-[20px] font-[700] text-center mb-4">
-                            Buy EDLN Tokens
+                            {buyMethod === null ? 'Buy EDLN Tokens' : buyMethod === 'sol' ? 'Buy with SOL' : 'Buy with Cash'}
                         </DialogTitle>
                     </DialogHeader>
                     
-                    <div className="flex flex-col gap-[16px]">
-                        <div className="flex flex-col gap-[8px]">
-                            <input
-                                type="number"
-                                placeholder="Amount in SOL"
-                                value={buyAmount}
-                                onChange={(e) => {
-                                    setBuyAmount(e.target.value)
-                                    if(parseFloat(e.target.value) > solBalance) {
-                                        setBuyError("Insufficient SOL balance")
-                                    } else {
-                                        setBuyError(null)
-                                    }
+                    {buyMethod === null && (
+                        <div className="flex flex-col gap-[12px]">
+                            <button
+                                onClick={() => setBuyMethod('sol')}
+                                className="bg-[#F9FBFC] dark:bg-[#2E3033] border-2 border-[#EDF3FC] dark:border-[#2E3033] rounded-[16px] p-[20px] hover:border-[#00FF80] dark:hover:border-[#00FF80] transition-colors text-left"
+                            >
+                                <p className="text-[#2D3C52] dark:text-[#E0E0E0] text-[16px] font-[700] mb-[4px]">Buy with SOL</p>
+                                <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[400]">Swap your SOL for EDLN tokens</p>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setBuyMethod('cash')
+                                    handleInitiateOnramp()
                                 }}
-                                disabled={isBuying}
-                                className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[12px] w-full text-[16px] font-[400] text-[#2D3C52] dark:text-[#E0E0E0] placeholder:text-[#61728C] dark:placeholder:text-[#B3B3B3] focus:outline-none focus:ring-2 focus:ring-[#00FF80] focus:border-transparent disabled:opacity-50"
-                            />
-                            <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[400] text-right">
-                                Available: {formatTokenAmount(solBalance, 4)} SOL
-                            </p>
-                        </div>
-                        
-                        {buyError && (
-                            <p className="text-[#FF3B30] text-[14px] font-[400] text-center">{buyError}</p>
-                        )}
-
-                        <div className="flex gap-[16px] mt-[16px]">
+                                disabled={isProcessingOnramp}
+                                className="bg-[#F9FBFC] dark:bg-[#2E3033] border-2 border-[#EDF3FC] dark:border-[#2E3033] rounded-[16px] p-[20px] hover:border-[#00FF80] dark:hover:border-[#00FF80] transition-colors text-left disabled:opacity-50"
+                            >
+                                <p className="text-[#2D3C52] dark:text-[#E0E0E0] text-[16px] font-[700] mb-[4px]">Buy with Cash</p>
+                                <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[400]">Purchase EDLN with bank transfer</p>
+                            </button>
                             <button
                                 onClick={toggleBuyModal}
-                                disabled={isBuying}
-                                className="bg-[#FFFFFF] dark:bg-[#000000] border border-[#000000] dark:border-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#000000] dark:text-[#00FF80] text-[16px] font-[700] hover:bg-[#F9FBFC] dark:hover:bg-[#1A1A1A] transition-colors disabled:opacity-50"
+                                className="bg-transparent text-[#61728C] dark:text-[#B3B3B3] px-[24px] py-[12px] rounded-[16px] font-[500] text-[14px] hover:bg-[#F9FBFC] dark:hover:bg-[#2E3033] transition-colors mt-[8px]"
                             >
                                 Cancel
                             </button>
+                        </div>
+                    )}
+
+                    {buyMethod === 'sol' && (
+                        <div className="flex flex-col gap-[16px]">
+                            <div className="flex flex-col gap-[8px]">
+                                <input
+                                    type="number"
+                                    placeholder="Amount in SOL"
+                                    value={buyAmount}
+                                    onChange={(e) => {
+                                        setBuyAmount(e.target.value)
+                                        if(parseFloat(e.target.value) > solBalance) {
+                                            setBuyError("Insufficient SOL balance")
+                                        } else {
+                                            setBuyError(null)
+                                        }
+                                    }}
+                                    disabled={isBuying}
+                                    className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[12px] w-full text-[16px] font-[400] text-[#2D3C52] dark:text-[#E0E0E0] placeholder:text-[#61728C] dark:placeholder:text-[#B3B3B3] focus:outline-none focus:ring-2 focus:ring-[#00FF80] focus:border-transparent disabled:opacity-50"
+                                />
+                                <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[400] text-right">
+                                    Available: {formatTokenAmount(solBalance, 4)} SOL
+                                </p>
+                            </div>
+                            
+                            {buyError && (
+                                <p className="text-[#FF3B30] text-[14px] font-[400] text-center">{buyError}</p>
+                            )}
+
+                            <div className="flex gap-[12px] mt-[8px]">
+                                <button
+                                    onClick={() => setBuyMethod(null)}
+                                    disabled={isBuying}
+                                    className="bg-[#FFFFFF] dark:bg-[#000000] border border-[#000000] dark:border-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#000000] dark:text-[#00FF80] text-[16px] font-[700] hover:bg-[#F9FBFC] dark:hover:bg-[#1A1A1A] transition-colors disabled:opacity-50"
+                                >
+                                    Back
+                                </button>
+
+                                <button
+                                    onClick={handleBuyEDLN}
+                                    disabled={buttonShouldBeDisabled}
+                                    className="bg-[#000000] dark:bg-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#00FF80] dark:text-[#000000] text-[16px] font-[700] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors disabled:opacity-50 flex items-center justify-center"
+                                >
+                                    {isBuying ? (
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#00FF80] dark:border-[#000000]"></div>
+                                    ) : (
+                                        "Buy EDLN"
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {buyMethod === 'cash' && onrampStep === 'otp' && (
+                        <div className="flex flex-col gap-[16px]">
+                            {!verifiedToken && (
+                                <div className="bg-[#F0FFF9] dark:bg-[rgba(0,255,128,0.1)] rounded-[12px] p-[12px] mb-[8px]">
+                                    <p className="text-[#000] dark:text-[#E0E0E0] text-[14px] font-[500]">
+                                        An OTP has been sent to <span className="font-[700]">{user?.email}</span>
+                                    </p>
+                                </div>
+                            )}
+
+                            {verifiedToken && (
+                                <div className="bg-[#F0FFF9] dark:bg-[rgba(0,255,128,0.1)] rounded-[12px] p-[12px] mb-[8px]">
+                                    <p className="text-[#000] dark:text-[#E0E0E0] text-[14px] font-[500] flex items-center gap-[8px]">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <span>Account verified! Enter amount to continue</span>
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="flex flex-col gap-[8px]">
+                                <label className="text-[#2D3C52] dark:text-[#E0E0E0] text-[14px] font-[600]">
+                                    Amount (NGN)
+                                </label>
+                                <input
+                                    type="number"
+                                    placeholder="Enter amount"
+                                    value={cashAmount}
+                                    onChange={(e) => setCashAmount(e.target.value)}
+                                    disabled={isProcessingOnramp}
+                                    className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[12px] w-full text-[16px] font-[400] text-[#2D3C52] dark:text-[#E0E0E0] placeholder:text-[#61728C] dark:placeholder:text-[#B3B3B3] focus:outline-none focus:ring-2 focus:ring-[#00FF80] focus:border-transparent disabled:opacity-50"
+                                />
+                            </div>
+
+                            {!verifiedToken && (
+                                <div className="flex flex-col gap-[8px]">
+                                    <label className="text-[#2D3C52] dark:text-[#E0E0E0] text-[14px] font-[600]">
+                                        Enter OTP
+                                    </label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter 6-digit code"
+                                        value={otp}
+                                        onChange={(e) => setOtp(e.target.value)}
+                                        maxLength={6}
+                                        disabled={isProcessingOnramp}
+                                        className="bg-[#F9FBFC] dark:bg-[#2E3033] border border-[#EDF3FC] dark:border-[#2E3033] rounded-[12px] p-[12px] w-full text-[16px] font-[400] text-[#2D3C52] dark:text-[#E0E0E0] placeholder:text-[#61728C] dark:placeholder:text-[#B3B3B3] focus:outline-none focus:ring-2 focus:ring-[#00FF80] focus:border-transparent disabled:opacity-50 text-center tracking-widest"
+                                    />
+                                </div>
+                            )}
+                            
+                            {onrampError && (
+                                <p className="text-[#FF3B30] text-[14px] font-[400] text-center">{onrampError}</p>
+                            )}
+
+                            <div className="flex gap-[12px] mt-[8px]">
+                                <button
+                                    onClick={() => {
+                                        setBuyMethod(null)
+                                        setOnrampStep('method')
+                                        setOtp("")
+                                        setCashAmount("")
+                                        setOnrampError(null)
+                                    }}
+                                    disabled={isProcessingOnramp}
+                                    className="bg-[#FFFFFF] dark:bg-[#000000] border border-[#000000] dark:border-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#000000] dark:text-[#00FF80] text-[16px] font-[700] hover:bg-[#F9FBFC] dark:hover:bg-[#1A1A1A] transition-colors disabled:opacity-50"
+                                >
+                                    Back
+                                </button>
+
+                                <button
+                                    onClick={handleVerifyOtp}
+                                    disabled={isProcessingOnramp || (!verifiedToken && !otp) || !cashAmount}
+                                    className="bg-[#000000] dark:bg-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#00FF80] dark:text-[#000000] text-[16px] font-[700] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors disabled:opacity-50 flex items-center justify-center"
+                                >
+                                    {isProcessingOnramp ? (
+                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#00FF80] dark:border-[#000000]"></div>
+                                    ) : (
+                                        verifiedToken ? "Continue" : "Verify & Continue"
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {buyMethod === 'cash' && onrampStep === 'payment' && paymentDetails && (
+                        <div className="flex flex-col gap-[16px]">
+                            <div className="bg-[#F0FFF9] dark:bg-[rgba(0,255,128,0.1)] rounded-[12px] p-[16px] mb-[8px]">
+                                <p className="text-[#000] dark:text-[#E0E0E0] text-[14px] font-[600] mb-[8px] text-center">
+                                    Transfer funds to complete your order
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col gap-[12px] bg-[#F9FBFC] dark:bg-[#2E3033] rounded-[16px] p-[16px]">
+                                <div className="flex justify-between items-center py-[8px] border-b border-[#EDF3FC] dark:border-[#404040]">
+                                    <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">Order ID</p>
+                                    <p className="text-[#2D3C52] dark:text-[#E0E0E0] text-[14px] font-[600]">{paymentDetails.id}</p>
+                                </div>
+
+                                <div className="flex justify-between items-center py-[8px] border-b border-[#EDF3FC] dark:border-[#404040]">
+                                    <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">Bank</p>
+                                    <p className="text-[#2D3C52] dark:text-[#E0E0E0] text-[14px] font-[600]">{paymentDetails.bank}</p>
+                                </div>
+
+                                <div className="flex justify-between items-center py-[8px] border-b border-[#EDF3FC] dark:border-[#404040]">
+                                    <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">Account Name</p>
+                                    <p className="text-[#2D3C52] dark:text-[#E0E0E0] text-[14px] font-[600]">{paymentDetails.accountName}</p>
+                                </div>
+
+                                <div className="flex justify-between items-center py-[8px] border-b border-[#EDF3FC] dark:border-[#404040]">
+                                    <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">Account Number</p>
+                                    <div className="flex items-center gap-[8px]">
+                                        <p className="text-[#2D3C52] dark:text-[#E0E0E0] text-[14px] font-[700]">{paymentDetails.accountNumber}</p>
+                                        <button
+                                            onClick={() => copyToClipboard(paymentDetails.accountNumber)}
+                                            className="p-1 hover:bg-black/10 dark:hover:bg-white/10 rounded transition-colors"
+                                        >
+                                            <Image src={copy} alt="copy" height={14} width={14} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-center py-[8px]">
+                                    <p className="text-[#61728C] dark:text-[#B3B3B3] text-[14px] font-[500]">Amount</p>
+                                    <p className="text-[#000000] dark:text-[#00FF80] text-[18px] font-[700]">₦{(paymentDetails.fiatAmount || 0).toLocaleString()}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-[#FFF3E0] dark:bg-[rgba(255,193,7,0.1)] rounded-[12px] p-[12px]">
+                                <p className="text-[#F57C00] dark:text-[#FFB300] text-[12px] font-[500] text-center">
+                                    Your EDLN tokens will be credited after payment confirmation
+                                </p>
+                            </div>
 
                             <button
-                                onClick={handleBuyEDLN}
-                                disabled={buttonShouldBeDisabled}
-                                
-                                className="bg-[#000000] dark:bg-[#00FF80] rounded-[16px] py-[12px] px-[24px] flex-1 text-[#00FF80] dark:text-[#000000] text-[16px] font-[700] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors disabled:opacity-50 flex items-center justify-center"
+                                onClick={toggleBuyModal}
+                                className="bg-[#000000] dark:bg-[#00FF80] text-[#00FF80] dark:text-[#000000] px-[32px] py-[12px] rounded-[16px] font-[700] text-[16px] hover:bg-[#333333] dark:hover:bg-[#00CC66] transition-colors w-full"
                             >
-                                {isBuying ? (
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#00FF80] dark:border-[#000000]"></div>
-                                ) : (
-                                    "Buy EDLN"
-                                )}
+                                Done
                             </button>
                         </div>
-                    </div>
+                    )}
                 </DialogContent>
             </Dialog>
 
